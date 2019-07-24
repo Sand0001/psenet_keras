@@ -10,6 +10,8 @@ from copy import deepcopy
 from numba import jit
 from tool.pse import find_label_coord,ufunc_4_cpp
 
+import tensorflow as tf 
+
 class BatchIndices():
     def __init__(self,total,batchsize,trainable=True):
         self.n = total
@@ -206,8 +208,8 @@ def calc_vote_angle(bin_img):
     most_angle  = Counter(angles).most_common(1)  
     most_angle =  0 if len(most_angle)==0 else most_angle[0][0]
 
-    if(most_angle>0 and most_angle<=45):
-        most_angle = most_angle + 90 
+    if(most_angle>=0 and most_angle<=45):
+        most_angle = most_angle - 90
     elif(most_angle>45 and most_angle<=90):
         most_angle = most_angle - 90
     elif(most_angle>90 and most_angle<=135):
@@ -256,6 +258,51 @@ def fit_boundingRect_warp_cpp(num_label,labelimage,M):
         rects.append(pt)
     return rects
 
+def warpAffine_Padded(src_h,src_w,M,mode='matrix'):
+    '''
+    重新计算旋转矩阵，防止cut off image
+    args：
+        src_h,src_w 原图的高、宽
+        mode: mode is matrix 时 M 是旋转矩阵
+              mode is angle 时  M 是角度
+    returns:
+        offset_M : 新的旋转矩阵
+        padded_w,padded_h : 图像的新宽、高
+    
+    ------------------------------------
+    用法：
+        h,w = imagetest.shape[0:2]
+        M = cv2.getRotationMatrix2D((w/2,h/2),angle,1.0)
+        offset_M , padded_w , padded_h = warpAffinePadded(h,w,M)
+        rects = cv2.transform(rects,offset_M)
+        imagetest = cv2.warpAffine(imagetest,offset_M,(padded_w,padded_h))
+    '''
+    if(mode == 'angle'):
+        M = cv2.getRotationMatrix2D((src_w/2,src_h/2),M,1.0)
+    
+    # 图像四个顶点
+    lin_pts = np.array([
+        [0,0],
+        [src_w,0],
+        [src_w,src_h],
+        [0,src_h]
+    ])
+    trans_lin_pts = cv2.transform(np.array([lin_pts]),M)[0]
+    
+    #最大最小点
+    min_x = np.floor(np.min(trans_lin_pts[:,0])).astype(int)
+    min_y = np.floor(np.min(trans_lin_pts[:,1])).astype(int)
+    max_x = np.ceil(np.max(trans_lin_pts[:,0])).astype(int)
+    max_y = np.ceil(np.max(trans_lin_pts[:,1])).astype(int)
+
+    offset_x = -min_x if min_x < 0 else 0
+    offset_y = -min_y if min_y < 0 else 0
+    #print('offsetx:{},offsety:{}'.format(offset_x,offset_y))
+    offset_M = M + [[0,0,offset_x],[0,0,offset_y]]
+
+    padded_w = src_w + (max_x - src_w)  + offset_x 
+    padded_h = src_h + (max_y - src_h)  + offset_y 
+    return offset_M,padded_w,padded_h
 
 class text_porposcal:
     def __init__(self,rects,max_dist = 50 , threshold_overlap_v = 0.5):
@@ -272,6 +319,7 @@ class text_porposcal:
         self.r_index = [[] for _ in range(self.max_w)]
         for index , rect in enumerate(rects):
             self.r_index[int(rect[0][0])].append(index)
+        self.tmp_connected = []
 
     def offset_coordinate(self,rects):
         '''
@@ -296,9 +344,10 @@ class text_porposcal:
         max_dist = min(max_dist , self.max_dist)    
         for left in range(rect[0][0]+1,min(self.max_w-1,rect[1][0]+max_dist)):
             for idx in self.r_index[left]:
-                if(self.meet_v_iou(index,idx) > self.threshold_overlap_v):
+                iou = self.meet_v_iou(index,idx)
+                if(iou > self.threshold_overlap_v):
                     return idx 
-        return -1
+        return -1 
 
     def meet_v_iou(self,index1,index2):
         '''
@@ -341,9 +390,6 @@ class text_porposcal:
         return [[x1,y1],[x2,y1],[x2,y2],[x1,y2]]
 
 
-
-
-
         # # 所有框的最小外接矩形
         # pt = np.array(text_boxes)
         # pt = pt.reshape((-1,2))
@@ -354,30 +400,73 @@ class text_porposcal:
         # rect = np.int0(rect)
         # return rect 
 
-
     def get_text_line(self):
+
+        #在textline对时候某些iou不够对框会跳过去，这个和独立对框是不同对
+        #这里申请一个临时存贮对list在保存这些跳过去对框
+        
         for idx ,_ in enumerate(self.rects):
             sucession = self.get_sucession(idx)
-            if(sucession>0):
+            if(sucession>0 and sucession not in self.tmp_connected ):
+                # and sucession not in self.tmp_connected
+                self.tmp_connected.append(sucession)
                 self.graph[idx][sucession] = 1 
-                
-        sub_graphs = self.sub_graphs_connected()
+           
+        # #独立未合并的框 , 和 iou不够 没有参与textline的框
+        # sub_graphs = self.sub_graphs_connected()
+        # set_element = set([y for x in sub_graphs for y in x])
+        # for idx , _ in enumerate(self.rects):
+        #     if(idx not in set_element):
+        #         sub_graphs.append([idx])
 
-        #独立未合并的框
-        #to do 这一步会导致 有些在文本行内部的小框，待优化
+        text_boxes = []
+        sub_graphs = self.sub_graphs_connected()
+        for sub_graph in sub_graphs:
+            tb = self.rects[list(sub_graph)]
+            tb = self.fit_box_2(tb)
+            text_boxes.append(tb)
+        text_boxes = np.array(text_boxes)
+
+
+        #独立未合并的框 , 和 iou不够 没有参与textline的框
         set_element = set([y for x in sub_graphs for y in x])
         for idx,_ in enumerate(self.rects):
             if(idx not in set_element):
-                sub_graphs.append([idx])
-        
-        text_boxes = []
-        for sub_graph in sub_graphs:
-            tb = self.rects[list(sub_graph)]
-            tb = self.fit_box(tb)
-            text_boxes.append(tb)
-
-        text_boxes = np.array(text_boxes)
+                inner_box = self.rects[[idx]]
+                inner_box = self.fit_box_2(inner_box)
+                if self.isInside(inner_box,text_boxes) == False:
+                    inner_box = np.expand_dims(np.array(inner_box),axis=0)
+                    if(text_boxes.shape[0] ==0):
+                        text_boxes = inner_box
+                    else:
+                        text_boxes = np.concatenate((text_boxes,inner_box),axis=0)
         # inv offset
         text_boxes = text_boxes - self.offset
         return text_boxes
+
+
+    def isInside(self,inner_rect,out_rects):
+        """
+            判断相交面积大于等于自身面积则为在内部
+        """
+        if(out_rects.shape[0] ==0):
+            return False
+        inner_area = abs(inner_rect[0][0] - inner_rect[1][0]) * abs(inner_rect[0][1] - inner_rect[3][1])
+        
+        x1 = np.maximum(inner_rect[0][0],out_rects[:,0,0])
+        y1 = np.maximum(inner_rect[0][1],out_rects[:,0,1])
+        x2 = np.minimum(inner_rect[2][0],out_rects[:,2,0])
+        y2 = np.minimum(inner_rect[2][1],out_rects[:,2,1])
+
+        w = np.maximum(0.0,x2 - x1)
+        h = np.maximum(0.0,y2 - y1)
+        interstion_area = w  * h 
+        # print("inner_area {}".format(inner_area))
+        # print("intersion_area:",interstion_area)
+        # print('W:',w)
+        # print('H',h)
+        if(((interstion_area / inner_area)>0.95)).any():
+            return True
+        else:
+            return False
 

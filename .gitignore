@@ -16,3 +16,5 @@ tf/checkpoint
 tf/
 *.pdf
 *.xml
+test/
+.vscode/settings.json
