@@ -11,6 +11,7 @@ n = 6   #the number of kernel scales
 
 ns = 2  #“1s”, “2s” and “4s” means the width and height of the output map are 1/1, 1/2 and 1/4 of the input
 
+visiable_gpu = '0'
 
 MTWI_2018_TXT_DIR = r'E:\psenet-MTWI\document\mtwi_2018_train\txt_train'
 MTWI_2018_IMG_DIR = r'E:\psenet-MTWI\document\mtwi_2018_train\image_train'
