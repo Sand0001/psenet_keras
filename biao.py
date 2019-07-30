@@ -10,7 +10,7 @@ import json
 import csv 
 
 url = r'http://39.104.88.168/ocr_pse_test?language=CHE'
-dir = r'/Users/mahuichao/Documents/PSENET/test/1'
+dir = r'/Users/mahuichao/Downloads/xinshuju20190726'
 img_files = glob.glob(os.path.join(dir,'*.jpg'))
 
 

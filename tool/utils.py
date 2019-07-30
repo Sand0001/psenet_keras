@@ -319,6 +319,8 @@ class text_porposcal:
         self.r_index = [[] for _ in range(self.max_w)]
         for index , rect in enumerate(rects):
             self.r_index[int(rect[0][0])].append(index)
+        
+        #记录已经参与textline的框
         self.tmp_connected = []
 
     def offset_coordinate(self,rects):
@@ -389,22 +391,9 @@ class text_porposcal:
         y2 = np.mean(text_boxes[:,2,1])
         return [[x1,y1],[x2,y1],[x2,y2],[x1,y2]]
 
-
-        # # 所有框的最小外接矩形
-        # pt = np.array(text_boxes)
-        # pt = pt.reshape((-1,2))
-        # print(pt.shape)
-        # print(pt)
-        # rect = cv2.minAreaRect(pt)
-        # rect = cv2.boxPoints(rect)
-        # rect = np.int0(rect)
-        # return rect 
-
     def get_text_line(self):
-
         #在textline对时候某些iou不够对框会跳过去，这个和独立对框是不同对
         #这里申请一个临时存贮对list在保存这些跳过去对框
-        
         for idx ,_ in enumerate(self.rects):
             sucession = self.get_sucession(idx)
             if(sucession>0 and sucession not in self.tmp_connected ):
@@ -412,12 +401,6 @@ class text_porposcal:
                 self.tmp_connected.append(sucession)
                 self.graph[idx][sucession] = 1 
            
-        # #独立未合并的框 , 和 iou不够 没有参与textline的框
-        # sub_graphs = self.sub_graphs_connected()
-        # set_element = set([y for x in sub_graphs for y in x])
-        # for idx , _ in enumerate(self.rects):
-        #     if(idx not in set_element):
-        #         sub_graphs.append([idx])
 
         text_boxes = []
         sub_graphs = self.sub_graphs_connected()
@@ -440,8 +423,14 @@ class text_porposcal:
                         text_boxes = inner_box
                     else:
                         text_boxes = np.concatenate((text_boxes,inner_box),axis=0)
+                    sub_graphs.append([idx])
         # inv offset
         text_boxes = text_boxes - self.offset
+        return text_boxes , sub_graphs
+
+    def get_text_line_split_cell(self,cell_lines):
+        text_boxes,sub_graphs = self.get_text_line()
+        text_boxes = self.split_by_cell(text_boxes,sub_graphs,cell_lines)
         return text_boxes
 
 
@@ -461,12 +450,80 @@ class text_porposcal:
         w = np.maximum(0.0,x2 - x1)
         h = np.maximum(0.0,y2 - y1)
         interstion_area = w  * h 
-        # print("inner_area {}".format(inner_area))
-        # print("intersion_area:",interstion_area)
-        # print('W:',w)
-        # print('H',h)
         if(((interstion_area / inner_area)>0.95)).any():
             return True
         else:
             return False
 
+
+    def split_by_cell(self,text_boxes,sub_graphs,cell_lines):
+        '''
+        根据表格线切分textline。
+        get_text_line 得到 text_boxes ,sub_graphs对应每个text_box 由哪些框rect组成
+        遍历每个text_box,如果被表格线截断：
+        1.切断text_box 但是未切断rect
+        2.切断text_box 也切断rect
+        '''
+        split_boxes = [] 
+        #cell_line按x坐标排序
+        cell_lines = sorted(cell_lines,key = lambda k:k[0])
+        cell_lines = np.array(cell_lines)
+        for text_box , sub_grah in zip(text_boxes , sub_graphs):
+            
+            res = [self.isSplit(cell_line , text_box) for cell_line in cell_lines]
+            if(np.array(res).any() == False):  #没有切断text_box
+                split_boxes.append(text_box)
+                continue
+                    
+            ###切断了text_box###
+            sub_rects = self.rects[sub_grah]
+            #小框按x坐标排序
+            sub_rects = sorted(sub_rects , key = lambda k:k[0][0],reverse = True )
+            s_cell_lines = cell_lines[res]
+            for s_c_l in s_cell_lines:  #遍历cell_line 
+                tmp_rects = [] 
+                s_c_l_x = s_c_l[0]
+                while(len(sub_rects)>0):
+                    tmp_rect = sub_rects.pop()
+                    left_x , right_x= tmp_rect[0][0] , tmp_rect[1][0]
+                    #print('cell line , left_x {} right_x {} x {}'.format(left_x,right_x,s_c_l_x))
+                    if(s_c_l_x >= right_x): ##cell_line 在小框右侧
+                        tmp_rects.append(tmp_rect)
+                    elif(s_c_l_x < right_x  and s_c_l_x > left_x): ## cell_line在小框中间
+                        left_rect = tmp_rect.copy()
+                        left_rect[1][0] = s_c_l_x
+                        left_rect[2][0] = s_c_l_x
+                        right_rect = tmp_rect.copy()
+                        right_rect[0][0] = s_c_l_x
+                        right_rect[3][0] = s_c_l_x
+                        tmp_rects.append(left_rect)
+                        sub_rects.append(right_rect)
+                        break
+                    else:       ## cell_line 在小框左侧
+                        sub_rects.append(tmp_rect)
+                        break
+                if(len(tmp_rects)>0):
+                    split_boxes.append(self.fit_box_2(np.array(tmp_rects)))
+            if(len(sub_rects)>0):
+                split_boxes.append(self.fit_box_2(np.array(sub_rects)))
+        return split_boxes
+
+
+    def isSplit(self,cell_line,box):
+        """
+        判断线段和矩形相交
+        这里采用简单方法，假设cell_line为垂直的
+        x1 在 bx1 bx2之间
+        y1,y2 与by1 by2 有重合的地方
+        """
+        x1,y1,_,y2 = cell_line
+        bx1,by1,bx2,by2 = box[0][0],box[0][1],box[2][0],box[2][1]
+
+        if(x1 > bx1 and x1 < bx2):
+            h = by2 - by1
+            y1 = max(y1,by1)
+            y2 = min(y2,by2)
+            overlap_v = max(0,y2- y1)/h
+            if(overlap_v > 0.5):
+                return True
+        return False
