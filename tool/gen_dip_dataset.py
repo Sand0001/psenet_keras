@@ -3,7 +3,7 @@ import cv2
 import pyclipper 
 import os 
 import traceback
-sys.path.append(r'data/mahuichao/PSENET')
+sys.path.append(r'/data/mahuichao/PSENET')
 import shutil
 import multiprocessing as mp
 from itertools import repeat
@@ -144,7 +144,7 @@ if __name__=='__main__':
     del_allfile(config.DIP_TRAIN_LABEL_DIR)
     del_allfile(config.DIP_TEST_LABEL_DIR)
 
-    with mp.Pool(processes=1) as pool:
+    with mp.Pool(processes=3) as pool:
         pool.map(gen_dataset,zip(train_data.items(),repeat(config.DIP_TRAIN_LABEL_DIR)))
         pool.map(gen_dataset,zip(test_data.items(),repeat(config.DIP_TEST_LABEL_DIR)))
 
