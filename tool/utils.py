@@ -56,8 +56,7 @@ def convert_label_to_id(label2id,labelimg):
     for i,j in label2id.items():
         idx = ((labelimg == i) * 1)
         idx = np.sum(idx,axis=2) >=3
-        npy = npy + idx * j
-
+        npy = npy + (idx * j).astype(np.uint8)
     return npy
 
 

@@ -18,6 +18,12 @@ MTWI_2018_IMG_DIR = r'E:\psenet-MTWI\document\mtwi_2018_train\image_train'
 MIWI_2018_TRAIN_LABEL_DIR = r'E:\psenet-MTWI\document\mtwi_2018_train\train_label'
 MIWI_2018_TEST_LABEL_DIR = r'E:\psenet-MTWI\document\mtwi_2018_train\test_label'
 
+DIP_IMG_DIR = r'/Users/mahuichao/Documents/tmp/text_shengchan0731'
+DIP_JSON_DIR = r'/Users/mahuichao/Documents/tmp/text_shengchan0731'
+DIP_TRAIN_LABEL_DIR = r'/Users/mahuichao/Documents/tmp/DD/TRAIN'
+DIP_TEST_LABEL_DIR = r'/Users/mahuichao/Documents/tmp/DD/TEST'
+
+
 label_to_id = {(255,255,255):0,(0,0,255):1}
 
 data_gen_min_scales = 0.8

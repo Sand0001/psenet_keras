@@ -377,3 +377,12 @@ for i in a :
         a.remove(j)
 
 #%%
+import numpy as np 
+npy = np.zeros((10,10),'uint8')
+idx = ((npy == 0) * 1)
+print(npy.dtype)
+npy = npy + (idx * 7).astype(np.uint8)
+print(npy.dtype)
+print( idx.dtype)
+
+#%%
