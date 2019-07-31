@@ -64,8 +64,8 @@ from tool.generator import Generator
 
 
 #%%
-train_dir = config.MIWI_2018_TRAIN_LABEL_DIR
-test_dir = config.MIWI_2018_TEST_LABEL_DIR
+train_dir = config.DIP_TRAIN_LABEL_DIR
+test_dir = config.DIP_TEST_LABEL_DIR
 batch_size = 4
 num_class = 2 
 shape = (640,640)
