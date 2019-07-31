@@ -84,12 +84,22 @@ model.load_weights('./tf/resnet50.hdf5')
 #%%
 res = parallel_model.fit_generator(gen_train,
                           steps_per_epoch =gen_train.num_samples()// batch_size,
-                          epochs = 100,
+                          epochs = 40,
 #                          validation_data=gen_test,
  #                         validation_steps =gen_test.num_samples()//batch_size,
                           verbose=1,
                           initial_epoch=0,
                           workers=4,
                           max_queue_size=16,
-                          callbacks=[checkpoint,tb])
+                          callbacks=[tb])
 
+res = parallel_model.fit_generator(gen_train,
+                          steps_per_epoch =gen_train.num_samples()// batch_size,
+                          epochs = 200,
+#                          validation_data=gen_test,
+ #                         validation_steps =gen_test.num_samples()//batch_size,
+                          verbose=1,
+                          initial_epoch=40,
+                          workers=4,
+                          max_queue_size=16,
+                          callbacks=[checkpoint,tb])
