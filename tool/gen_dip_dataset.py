@@ -3,7 +3,7 @@ import cv2
 import pyclipper 
 import os 
 import traceback
-sys.path.append(r'/Users/mahuichao/Documents/PSENET')
+sys.path.append(r'data/mahuichao/PSENET')
 import shutil
 import multiprocessing as mp
 from itertools import repeat
