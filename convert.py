@@ -26,16 +26,8 @@ inputs = keras.layers.Input(shape=shape)
 output = psenet(inputs)
 model  = keras.models.Model(inputs,output)
 model.summary()
-
-
-#%%
-from keras.optimizers import Adam
-from models.loss import build_loss
-from models.metrics import build_iou,mean_iou
 from keras.utils import multi_gpu_model
 
-
-#%%
 parallel_model = multi_gpu_model(model)
 parallel_model.load_weights('./tf/finetune-41.hdf5')
 
@@ -49,17 +41,22 @@ batch_size = 1
 num_class = 2 
 shape = (640,640)
 gen_train = Generator(train_dir,batch_size = batch_size ,istraining=True,num_classes=num_class,mirror = False,reshape=shape)
-images,_ = next(gen_train)
+ 
+import cv2
+for i in range(100):
+    images,_ = next(gen_train)
+    cv2.imwrite('./tmp/res{}.jpg'.format(i),images[0])
+
 import cv2
 import numpy as np 
-res = parallel_model.predict(images[0:1,:,:,:])
+res = model.predict(images[0:1,:,:,:])
 res1 = res[0]
-res1[res1>0.5]= 1
+res1[res1>0.5]= 255
 res1[res1<=0.5]= 0
 print('res1 shape',res1.shape)
 print('nozero:',np.count_nonzero(res1>0.5))
 for i in range(6):
-    tmp = (res1[:,:,i]*255).astype(np.uint8)
+    tmp = (res1[:,:,i]).astype(np.uint8)
     cv2.imwrite('./res{}.jpg'.format(i),tmp)
 cv2.imwrite('./src.jpg',images[0])
 #model.save_weights('./tf/signle_fintetune-50.hdf5')
