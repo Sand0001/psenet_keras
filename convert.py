@@ -38,4 +38,16 @@ from keras.utils import multi_gpu_model
 #%%
 parallel_model = multi_gpu_model(model)
 parallel_model.load_weights('./tf/finetune-50.hdf5')
+
+
+import cv2
+images = cv2.imread('tmp.jpg')
+images = np.reshape(images,(1,h,w,3))
+res = model.predict(images[0:1,:,:,:])
+res1 = res[0]
+res1[res1>0.5]= 1
+res1[res1<=0.5]= 0
+res1 = (res1[:,:,5]*255).astype('uint8')
+cv2.imwrite('./res.jpg',res1)
+
 model.save_weights('./tf/signle_fintetune-50.hdf5')
