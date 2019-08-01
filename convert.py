@@ -39,10 +39,18 @@ from keras.utils import multi_gpu_model
 parallel_model = multi_gpu_model(model)
 parallel_model.load_weights('./tf/finetune-50.hdf5')
 
+from tool.generator import Generator
 
+#%%
+import config 
+train_dir = config.DIP_TRAIN_LABEL_DIR
+test_dir = config.DIP_TEST_LABEL_DIR
+batch_size = 1
+num_class = 2 
+shape = (640,640)
+gen_train = Generator(train_dir,batch_size = batch_size ,istraining=True,num_classes=num_class,mirror = False,reshape=shape)
+images,_ = next(gen_train)
 import cv2
-images = cv2.imread('tmp.jpg')
-images = np.reshape(images,(1,h,w,3))
 res = model.predict(images[0:1,:,:,:])
 res1 = res[0]
 res1[res1>0.5]= 1
@@ -50,4 +58,4 @@ res1[res1<=0.5]= 0
 res1 = (res1[:,:,5]*255).astype('uint8')
 cv2.imwrite('./res.jpg',res1)
 
-model.save_weights('./tf/signle_fintetune-50.hdf5')
+#model.save_weights('./tf/signle_fintetune-50.hdf5')
