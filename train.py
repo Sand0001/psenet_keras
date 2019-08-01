@@ -28,6 +28,7 @@ model  = keras.models.Model(inputs,output)
 model.summary()
 
 
+model.load_weights('./tf/resnet50.hdf5')
 #%%
 from keras.optimizers import Adam
 from models.loss import build_loss
@@ -66,11 +67,10 @@ shape = (640,640)
 
 
 #%%
-gen_train = Generator(train_dir,batch_size = batch_size ,istraining=True,num_classes=num_class,mirror = False,reshape=shape)
+gen_train = Generator(train_dir,batch_size = batch_size ,istraining=True,num_classes=num_class,mirror = False,reshape=shape,trans_color = False)
 
 #%%
-#gen_test = Generator(test_dir,batch_size = batch_size ,istraining=False,num_classes=num_class,
-#                     reshape=shape,mirror=False,scale=False,clip=False,trans_color=False)
+gen_train = Generator(train_dir,batch_size = batch_size ,istraining=True,num_classes=num_class,mirror = False,reshape=shape,trans_color = False)
 
 
 #%%
@@ -80,7 +80,6 @@ checkpoint = ModelCheckpoint(r'./tf/finetune-{epoch:02d}.hdf5',
                            save_weights_only=True)
 tb = TensorBoard(log_dir='./logs', update_freq=10)
 
-model.load_weights('./tf/resnet50.hdf5')
 #%%
 res = parallel_model.fit_generator(gen_train,
                           steps_per_epoch =gen_train.num_samples()// batch_size,
