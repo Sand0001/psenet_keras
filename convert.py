@@ -52,7 +52,7 @@ gen_train = Generator(train_dir,batch_size = batch_size ,istraining=True,num_cla
 images,_ = next(gen_train)
 import cv2
 import numpy as np 
-res = model.predict(images[0:1,:,:,:])
+res = parallel_model.predict(images[0:1,:,:,:])
 res1 = res[0]
 res1[res1>0.5]= 1
 res1[res1<=0.5]= 0

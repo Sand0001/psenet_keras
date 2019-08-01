@@ -70,7 +70,7 @@ shape = (640,640)
 gen_train = Generator(train_dir,batch_size = batch_size ,istraining=True,num_classes=num_class,mirror = False,reshape=shape,trans_color = False)
 
 #%%
-gen_train = Generator(train_dir,batch_size = batch_size ,istraining=True,num_classes=num_class,mirror = False,reshape=shape,trans_color = False)
+gen_test = Generator(train_dir,batch_size = batch_size ,istraining=True,num_classes=num_class,mirror = False,reshape=shape,trans_color = False)
 
 
 #%%
@@ -83,9 +83,9 @@ tb = TensorBoard(log_dir='./logs', update_freq=10)
 #%%
 res = parallel_model.fit_generator(gen_train,
                           steps_per_epoch =gen_train.num_samples()// batch_size,
-                          epochs = 40,
-#                          validation_data=gen_test,
- #                         validation_steps =gen_test.num_samples()//batch_size,
+                          epochs = 10,
+                          validation_data=gen_test,
+                          validation_steps =gen_test.num_samples()//batch_size,
                           verbose=1,
                           initial_epoch=0,
                           workers=4,
@@ -96,10 +96,10 @@ res = parallel_model.fit_generator(gen_train,
 res = parallel_model.fit_generator(gen_train,
                           steps_per_epoch =gen_train.num_samples()// batch_size,
                           epochs = 200,
-#                          validation_data=gen_test,
- #                         validation_steps =gen_test.num_samples()//batch_size,
+                          validation_data=gen_test,
+                          validation_steps =gen_test.num_samples()//batch_size,
                           verbose=1,
-                          initial_epoch=40,
+                          initial_epoch=10,
                           workers=4,
                           use_multiprocessing=True,
                           max_queue_size=16,
