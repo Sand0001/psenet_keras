@@ -89,6 +89,7 @@ res = parallel_model.fit_generator(gen_train,
                           verbose=1,
                           initial_epoch=0,
                           workers=4,
+                          use_multiprocessing=True,
                           max_queue_size=16,
                           callbacks=[tb])
 
@@ -100,5 +101,6 @@ res = parallel_model.fit_generator(gen_train,
                           verbose=1,
                           initial_epoch=40,
                           workers=4,
+                          use_multiprocessing=True,
                           max_queue_size=16,
                           callbacks=[checkpoint,tb])
