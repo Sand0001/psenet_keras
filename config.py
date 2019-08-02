@@ -22,12 +22,15 @@ DIP_IMG_DIR = r'/data/mahuichao/PSENET/data/TEXT_SHENGCHAN190724'
 DIP_JSON_DIR = r'/data/mahuichao/PSENET/data/TEXT_SHENGCHAN190724'
 DIP_TRAIN_LABEL_DIR = r'/data/mahuichao/PSENET/data/TEXT_SHENGCHAN190724/train'
 DIP_TEST_LABEL_DIR = r'/data/mahuichao/PSENET/data/TEXT_SHENGCHAN190724/test'
-
+#DIP_IMG_DIR = r'/data/mahuichao/PSENET/data/tmp'
+#DIP_JSON_DIR = r'/data/mahuichao/PSENET/data/tmp'
+#DIP_TRAIN_LABEL_DIR = r'/data/mahuichao/PSENET/data/tmp/train'
+#DIP_TEST_LABEL_DIR = r'/data/mahuichao/PSENET/data/tmp/test'
 
 label_to_id = {(255,255,255):0,(0,0,255):1}
 
 data_gen_min_scales = 0.3
-data_gen_max_scales = 0.7
+data_gen_max_scales = 0.5
 data_gen_itter_scales = 0.1
 
 #随机剪切 文字区域最小面积

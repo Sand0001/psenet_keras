@@ -29,7 +29,6 @@ model.summary()
 from keras.utils import multi_gpu_model
 
 parallel_model = multi_gpu_model(model)
-parallel_model.load_weights('./tf/finetune-41.hdf5')
 
 from tool.generator import Generator
 

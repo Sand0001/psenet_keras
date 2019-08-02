@@ -37,7 +37,7 @@ from keras.utils import multi_gpu_model
 
 
 #%%
-parallel_model = multi_gpu_model(model)
+#parallel_model = multi_gpu_model(model)
 
 
 #%%
@@ -49,7 +49,7 @@ ious = build_iou([0,1],['bk','txt'])
 
 
 #%%
-parallel_model.compile(loss=build_loss,
+model.compile(loss=build_loss,
               optimizer=adam,
               metrics=ious)
 
@@ -61,7 +61,7 @@ from tool.generator import Generator
 import config 
 train_dir = config.DIP_TRAIN_LABEL_DIR
 test_dir = config.DIP_TEST_LABEL_DIR
-batch_size = 6
+batch_size = 4
 num_class = 2 
 shape = (640,640)
 
@@ -81,26 +81,15 @@ checkpoint = ModelCheckpoint(r'./tf/finetune-{epoch:02d}.hdf5',
 tb = TensorBoard(log_dir='./logs', update_freq=10)
 
 #%%
-res = parallel_model.fit_generator(gen_train,
-                          steps_per_epoch =gen_train.num_samples()// batch_size,
-                          epochs = 10,
+res = model.fit_generator(gen_train,
+                          steps_per_epoch =gen_train.num_samples()// batch_size * 50,
+                          epochs = 100,
                           validation_data=gen_test,
-                          validation_steps =gen_test.num_samples()//batch_size,
+                          validation_steps =gen_test.num_samples()//batch_size * 20,
                           verbose=1,
-                          initial_epoch=0,
+                          initial_epoch=1,
                           workers=4,
-                          use_multiprocessing=True,
+                          use_multiprocessing=False,
                           max_queue_size=16,
-                          callbacks=[tb])
+                          callbacks=[tb,checkpoint])
 
-res = parallel_model.fit_generator(gen_train,
-                          steps_per_epoch =gen_train.num_samples()// batch_size,
-                          epochs = 200,
-                          validation_data=gen_test,
-                          validation_steps =gen_test.num_samples()//batch_size,
-                          verbose=1,
-                          initial_epoch=10,
-                          workers=4,
-                          use_multiprocessing=True,
-                          max_queue_size=16,
-                          callbacks=[checkpoint,tb])
