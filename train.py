@@ -80,7 +80,7 @@ def schedule(epoch):
         return 1e-4
     elif(epoch < 100):
         return 1e-5
-    else
+    else:
         return 1e-6
 lr = LearningRateScheduler(schedule)
 #%%
