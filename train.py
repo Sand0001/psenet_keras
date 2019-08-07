@@ -84,7 +84,7 @@ def schedule(epoch):
         return 1e-6
 lr = LearningRateScheduler(schedule)
 #%%
-res = model.fit_generator(gen_train,
+res = multi_model.fit_generator(gen_train,
                           steps_per_epoch =gen_train.num_samples()// batch_size ,
                           epochs = 150,
                           validation_data=gen_test,
