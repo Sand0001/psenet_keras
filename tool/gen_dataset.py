@@ -1,5 +1,5 @@
 import sys
-sys.path.insert(0,r'E:\psenet-MTWI\PSENET')
+sys.path.append('/data/mahuichao/PSENET')
 
 import cv2
 import pyclipper 
@@ -79,9 +79,9 @@ def gen_dataset(data):
             npy = convert_label_to_id(config.label_to_id,label)
             npys[:,:,idx] = npy
         np.save(os.path.join(dst_dir,basename+'.npy'),npys)
-    except:
-        print(imgname)
-        ddd = r'E:\psenet-MTWI\document\mtwi_2018_train\bad'
+    except Exception as e:
+        print(e,'->',imgname)
+        ddd = r'/data/mahuichao/PSENET/data/tmp'
         shutil.copyfile(imgname,os.path.join(ddd,basename))
 
 def create_dataset():
