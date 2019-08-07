@@ -83,7 +83,7 @@ class Generator():
         img = img[:,:,::-1]
         return img
 
-    def trans_gray(self,img):
+    def trans_gray_image(self,img):
         img =  cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
         img =  cv2.cvtColor(img,cv2.COLOR_GRAY2BGR)
         return img 
@@ -144,8 +144,8 @@ class Generator():
                     img = self.trans_color_image(img)
 
                 if(self.trans_gray and np.random.randint(0,10)>7):
-                    img = self.trans_gray(img)
-                                            
+                    img = self.trans_gray_image(img)
+
                 #reshape到训练尺寸
                 if(self.reshape):
                     img,l = self.reshape_image(img,l,self.reshape)
