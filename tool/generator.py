@@ -167,12 +167,10 @@ class Generator():
             elif(self.mirror and seed > 70):
                 images = images[:,:,::-1,:]
                 labels = labels[:,:,::-1,:]
-            else:
-                pass
                 
             return images, labels
         except Exception as e :
-            print(e,self.imagelist[idx])
+            print(e,j)
             traceback.print_exc()
             self.__next__()
 
