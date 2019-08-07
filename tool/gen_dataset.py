@@ -1,6 +1,6 @@
 import sys
 sys.path.append('/data/mahuichao/PSENET')
-
+from PIL import Image
 import cv2
 import pyclipper 
 import os 
@@ -54,7 +54,11 @@ def gen_dataset(data):
     dst_dir = data[1]
     try:
         basename = '.'.join(os.path.basename(imgname).split('.')[:-1])
-        img = cv2.imread(imgname)
+        ##img = cv2.imread(imgname)
+        img = Image.open(imgname)
+        img = img.convert('RGB')
+        img = np.array(img)
+        img = img[:,:,::-1]
         labels = np.ones((config.n,img.shape[0],img.shape[1],3))
         labels = labels * 255
         npys = np.zeros((img.shape[0],img.shape[1],config.n))
