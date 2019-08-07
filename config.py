@@ -1,6 +1,6 @@
 
 max_depth = 256
-upsample_filters = [128,128,128,128]  #from buttom to top 
+upsample_filters = [256,256,256,256]  #from buttom to top 
 SN = 6           # number of kernel scales
 
 rate_lc_ls = 0.7    #balances the importance between Lc and Ls 
@@ -13,25 +13,21 @@ ns = 2  #“1s”, “2s” and “4s” means the width and height of the outpu
 
 visiable_gpu = '4,5'
 
-#MTWI_2018_TXT_DIR = r'E:\psenet-MTWI\document\mtwi_2018_train\txt_train'
-#MTWI_2018_IMG_DIR = r'E:\psenet-MTWI\document\mtwi_2018_train\image_train'
-#MIWI_2018_TRAIN_LABEL_DIR = r'E:\psenet-MTWI\document\mtwi_2018_train\train_label'
-#MIWI_2018_TEST_LABEL_DIR = r'E:\psenet-MTWI\document\mtwi_2018_train\test_label'
+MTWI_2018_TXT_DIR = r'/data/mahuichao/PSENET/data/MTWI_2018/label'
+MTWI_2018_IMG_DIR = r'/data/mahuichao/PSENET/data/MTWI_2018/image'
+MIWI_2018_TRAIN_LABEL_DIR = r'/data/mahuichao/PSENET/data/MTWI_2018/train_label'
+MIWI_2018_TEST_LABEL_DIR = r'/data/mahuichao/PSENET/data/MTWI_2018/test_label'
 
 DIP_IMG_DIR = r'/data/mahuichao/PSENET/data/TEXT_SHENGCHAN190724'
 DIP_JSON_DIR = r'/data/mahuichao/PSENET/data/TEXT_SHENGCHAN190724'
 DIP_TRAIN_LABEL_DIR = r'/data/mahuichao/PSENET/data/TEXT_SHENGCHAN190724/train'
 DIP_TEST_LABEL_DIR = r'/data/mahuichao/PSENET/data/TEXT_SHENGCHAN190724/test'
-#DIP_IMG_DIR = r'/data/mahuichao/PSENET/data/tmp'
-#DIP_JSON_DIR = r'/data/mahuichao/PSENET/data/tmp'
-#DIP_TRAIN_LABEL_DIR = r'/data/mahuichao/PSENET/data/tmp/train'
-#DIP_TEST_LABEL_DIR = r'/data/mahuichao/PSENET/data/tmp/test'
 
 label_to_id = {(255,255,255):0,(0,0,255):1}
 
-data_gen_min_scales = 0.3
-data_gen_max_scales = 0.5
-data_gen_itter_scales = 0.1
+data_gen_min_scales = 0.8
+data_gen_max_scales = 2
+data_gen_itter_scales = 0.3
 
 #随机剪切 文字区域最小面积
 data_gen_clip_min_area = 20*100

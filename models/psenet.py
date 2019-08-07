@@ -41,7 +41,7 @@ def conv_bn_relu(input_tensor,filters , kernel_size = 3 ,bn = True ,
 
 
 
-def upsample_conv(input_tensor,concat_tensor,filters,type='resize',kernel_size=3):
+def upsample_conv(input_tensor,concat_tensor,filters,type='resize',kernel_size=3,mode = 'add'):
     '''
     upsmaple : use resize image + conv  or transpose conv or unsmaple + conv
     '''
@@ -56,8 +56,11 @@ def upsample_conv(input_tensor,concat_tensor,filters,type='resize',kernel_size=3
     
     #todo conv again?
 
-    #concat two layers
-    output_image = Concatenate(axis=3)([output_image,concat_tensor])
+    #concat or add two layers
+    if(mode == 'add'):
+        output_image = Add(axis=3)([output_image,concat_tensor])
+    else:
+        output_image = Concatenate(axis=3)([output_image,concat_tensor])
     #output_image =Add()([output_image,concat_tensor])
 
     output_image = conv_bn_relu(output_image,filters)

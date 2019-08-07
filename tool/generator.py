@@ -13,7 +13,7 @@ from tool.utils import BatchIndices
 
 class Generator():
     def __init__(self,dir,batch_size = 2 , istraining = True,num_classes = 2,
-                 trans_color = True,mirror=False,scale=True,clip=True,reshape=(640,640)):
+                 trans_color = True,trans_gray = True,mirror=False,scale=True,clip=True,reshape=(640,640)):
         self.dir = dir 
         self.lock = threading.Lock()
         self.batch_size = batch_size
@@ -24,6 +24,7 @@ class Generator():
         self.reshape = reshape  #(h,w)
         self.clip = clip
         self.trans_color = trans_color
+        self.trans_gray = trans_gray
         self.imagelist,self.labellist = self.list_dir(self.dir)
         self.batch_idx = BatchIndices(self.imagelist.shape[0],self.batch_size,self.shuffle)
     def num_classes(self):
@@ -82,6 +83,10 @@ class Generator():
         img = img[:,:,::-1]
         return img
 
+    def trans_gray(self,img):
+        img =  cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
+        img =  cv2.cvtColor(img,cv2.COLOR_GRAY2BGR)
+        return img 
 
     def clip_image(self,img,label,shape):
         h,w = img.shape[0:2]
@@ -137,7 +142,10 @@ class Generator():
                 #颜色通道转换
                 if(self.trans_color and np.random.randint(0,10)>5):
                     img = self.trans_color_image(img)
-                         
+
+                if(self.trans_gray and np.random.randint(0,10)>7):
+                    img = self.trans_gray(img)
+                                            
                 #reshape到训练尺寸
                 if(self.reshape):
                     img,l = self.reshape_image(img,l,self.reshape)
