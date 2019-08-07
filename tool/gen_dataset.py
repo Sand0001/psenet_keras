@@ -82,7 +82,7 @@ def gen_dataset(data):
     except Exception as e:
         print(e,'->',imgname)
         ddd = r'/data/mahuichao/PSENET/data/tmp'
-        shutil.copyfile(imgname,os.path.join(ddd,basename))
+        shutil.copyfile(imgname,os.path.join(ddd,os.path.basename(imgname)))
 
 def create_dataset():
     data = read_dataset()
