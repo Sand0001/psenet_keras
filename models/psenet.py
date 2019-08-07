@@ -58,7 +58,7 @@ def upsample_conv(input_tensor,concat_tensor,filters,type='resize',kernel_size=3
 
     #concat or add two layers
     if(mode == 'add'):
-        output_image = Add(axis=3)([output_image,concat_tensor])
+        output_image = Add()([output_image,concat_tensor])
     else:
         output_image = Concatenate(axis=3)([output_image,concat_tensor])
     #output_image =Add()([output_image,concat_tensor])
