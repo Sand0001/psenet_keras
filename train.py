@@ -53,7 +53,7 @@ from tool.generator import Generator
 import config 
 train_dir = config.MIWI_2018_TRAIN_LABEL_DIR
 test_dir = config.MIWI_2018_TEST_LABEL_DIR
-batch_size = 16
+batch_size = 8
 num_class = 2 
 shape = (640,640)
 

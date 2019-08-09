@@ -95,7 +95,7 @@ class Generator():
         #img的短边要大于 shape的长边，不足的padding
         dh = max(h,ih)
         dw = max(w,iw)
-        newimg = np.ones((dh,dw,img.shape[2]))*128
+        newimg = np.ones((dh,dw,img.shape[2]),dtype = np.uint8)*128
         newlabel = np.zeros((dh,dw,label.shape[2]))
         ty = (dh - h )//2
         tx = (dw - w)//2
@@ -171,6 +171,7 @@ class Generator():
             return images, labels
         except Exception as e :
             print(e,j)
+            print('imageshape',img.shape)
             traceback.print_exc()
             self.__next__()
 
