@@ -551,31 +551,32 @@ def morphology_closing_combine(rects):
     bin_img = np.zeros((ymax,xmax),dtype = np.uint8)
     for rect in rects:
         cv2.drawContours(bin_img,[rect],-1,(255),-1)
-    cv2.imwrite('source.jpg',bin_img)
+    #cv2.imwrite('source.jpg',bin_img)
     #做一个closing
     cluster_h = rects[:,2,1] - rects[:,0,1]
     cluster_h = np.reshape(cluster_h/2,(-1,1))
     km = KMeans(n_clusters=1).fit(cluster_h)
     c_h = km.cluster_centers_[0][0]
-    print('c_h:',c_h)
+    #print('c_h:',c_h)
     kernel = np.ones((int(c_h),2))
     closed_img = cv2.morphologyEx(bin_img,cv2.MORPH_CLOSE,kernel)
-    cv2.imwrite('closing.jpg',closed_img)
+    #cv2.imwrite('closing.jpg',closed_img)
     _,cnts,_ = cv2.findContours(closed_img,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
     combine_rects = [[] for i in range(len(cnts))]
     for rect in rects:
         for idx , cnt in enumerate(cnts):
             center_x , center_y = (rect[0][0] + rect[2][0]) //2 ,(rect[0][1] + rect[2][1]) //2
             inside = cv2.pointPolygonTest(cnt,(center_x,center_y),False)
-            print('inside:',inside)
+            #print('inside:',inside)
             if(inside == 1):
-                print('rect',rect)
+                #print('rect',rect)
                 combine_rects[idx].append(rect)
     
     text_line_rects = [] 
     print(len(combine_rects))
     for c_rts in combine_rects:
-        print(c_rts)
+        if(c_rts == []):
+            continue
         g = text_porposcal(c_rts,max_dist=100,scale_h = 5,threshold_overlap_v=0.5)
         rts,_ = g.get_text_line()
         if(text_line_rects ==[]):
@@ -583,3 +584,4 @@ def morphology_closing_combine(rects):
         else:
             text_line_rects = np.vstack((text_line_rects,rts))
     return text_line_rects
+        
