@@ -81,10 +81,10 @@ def FPN(blocks,type= 'resize'):
  
     # get four 256 channels featuremaps (i.e. P2, P3, P4, P5) from the backbone.
     PN = []
-    output_tensor = blocks[0]
+    output_tensor = blocks[0] 
     PN.append(output_tensor)
     for i in range(1,len(blocks)):
-        output_tensor = upsample_conv(output_tensor,blocks[i],config.upsample_filters[i-1],type,mode = config.mode)
+        output_tensor = upsample_conv(output_tensor,blocks[i],config.upsample_filters[config.mode][i-1],type,mode = config.mode) 
         PN.append(output_tensor)
 
     #[P5,P4,P3,P2]

@@ -13,10 +13,8 @@ KTF.set_session(session)
 #%%
 import keras 
 from models.psenet import psenet
-
 #%%
 shape = (None,None,3)
-
 
 #%%
 inputs = keras.layers.Input(shape=shape)
