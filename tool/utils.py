@@ -4,6 +4,7 @@ import csv
 import os
 import shutil
 import cv2
+from sklearn.cluster import KMeans
 import glob
 from collections import Counter
 from copy import deepcopy
@@ -304,7 +305,7 @@ def warpAffine_Padded(src_h,src_w,M,mode='matrix'):
     return offset_M,padded_w,padded_h
 
 class text_porposcal:
-    def __init__(self,rects,max_dist = 50 , threshold_overlap_v = 0.5):
+    def __init__(self,rects,max_dist = 50 , scale_h = 1.5 ,threshold_overlap_v = 0.5):
         self.rects = np.array(rects) 
         #offset
         rects , max_w , offset = self.offset_coordinate(self.rects)
@@ -313,6 +314,7 @@ class text_porposcal:
         self.offset = offset
 
         self.max_dist = max_dist 
+        self.scale_h = scale_h
         self.threshold_overlap_v = threshold_overlap_v
         self.graph = np.zeros((self.rects.shape[0],self.rects.shape[0]))
         self.r_index = [[] for _ in range(self.max_w)]
@@ -341,7 +343,7 @@ class text_porposcal:
     def get_sucession(self,index):
         rect = self.rects[index]
         #以高度作为搜索长度
-        max_dist =  int((rect[3][1] - rect[0][1] ) * 1.5)
+        max_dist =  int((rect[3][1] - rect[0][1] ) * self.scale_h)
         max_dist = min(max_dist , self.max_dist)    
         for left in range(rect[0][0]+1,min(self.max_w-1,rect[1][0]+max_dist)):
             for idx in self.r_index[left]:
@@ -426,6 +428,12 @@ class text_porposcal:
         # inv offset
         text_boxes = text_boxes - self.offset
         return text_boxes , sub_graphs
+
+
+    def get_text_line_morpholopy_closing(self):
+        text_boxes,sub_graphs = self.get_text_line()
+        self.morphology_closing_combine(text_boxes)
+
 
     def get_text_line_split_cell(self,cell_lines):
         text_boxes,sub_graphs = self.get_text_line()
@@ -526,3 +534,54 @@ class text_porposcal:
             if(overlap_v > 0.5):
                 return True
         return False
+
+def morphology_closing_combine(rects):
+    '''
+    使用闭运算做联通域，对文字块内对rects采用大值text_line
+    '''
+    g = text_porposcal(rects,max_dist=20,scale_h = 1.5,threshold_overlap_v=0.5)
+    rects,_ = g.get_text_line()
+    if(len(rects)<2):
+        return rects
+    #画一个二值图
+    xmax = np.max(rects[:,:,0])
+    ymax = np.max(rects[:,:,1])
+    xmax = xmax + 10 
+    ymax = ymax + 10 
+    bin_img = np.zeros((ymax,xmax),dtype = np.uint8)
+    for rect in rects:
+        cv2.drawContours(bin_img,[rect],-1,(255),-1)
+    #cv2.imwrite('source.jpg',bin_img)
+    #做一个closing
+    cluster_h = rects[:,2,1] - rects[:,0,1]
+    cluster_h = np.reshape(cluster_h,(-1,1))
+    km = KMeans(n_clusters=1).fit(cluster_h)
+    c_h = km.cluster_centers_[0][0]
+    #print('c_h:',c_h)
+    kernel = np.ones((int(c_h),2))
+    closed_img = cv2.morphologyEx(bin_img,cv2.MORPH_CLOSE,kernel)
+    #cv2.imwrite('closing.jpg',closed_img)
+    _,cnts,_ = cv2.findContours(closed_img,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
+    combine_rects = [[] for i in range(len(cnts))]
+    for rect in rects:
+        for idx , cnt in enumerate(cnts):
+            center_x , center_y = (rect[0][0] + rect[2][0]) //2 ,(rect[0][1] + rect[2][1]) //2
+            inside = cv2.pointPolygonTest(cnt,(center_x,center_y),False)
+            #print('inside:',inside)
+            if(inside == 1):
+                #print('rect',rect)
+                combine_rects[idx].append(rect)
+    
+    text_line_rects = [] 
+    print(len(combine_rects))
+    for c_rts in combine_rects:
+        if(c_rts == []):
+            continue
+        g = text_porposcal(c_rts,max_dist=100,scale_h = 5,threshold_overlap_v=0.5)
+        rts,_ = g.get_text_line()
+        if(text_line_rects ==[]):
+            text_line_rects = rts
+        else:
+            text_line_rects = np.vstack((text_line_rects,rts))
+    return text_line_rects
+        
