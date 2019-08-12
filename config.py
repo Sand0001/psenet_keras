@@ -1,7 +1,7 @@
 
 max_depth = 256
 mode = 'concat'
-upsample_filters = {'add':[256,256,256,256],'concat':[128,128,128]}  #from buttom to top 
+upsample_filters = {'add':[256,256,256,256],'concat':[128,128,128,128]}  #from buttom to top 
 SN = 6           # number of kernel scales
 
 rate_lc_ls = 0.7    #balances the importance between Lc and Ls 
