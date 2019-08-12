@@ -554,7 +554,7 @@ def morphology_closing_combine(rects):
     #cv2.imwrite('source.jpg',bin_img)
     #做一个closing
     cluster_h = rects[:,2,1] - rects[:,0,1]
-    cluster_h = np.reshape(cluster_h/2,(-1,1))
+    cluster_h = np.reshape(cluster_h,(-1,1))
     km = KMeans(n_clusters=1).fit(cluster_h)
     c_h = km.cluster_centers_[0][0]
     #print('c_h:',c_h)
