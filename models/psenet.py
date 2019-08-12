@@ -71,15 +71,20 @@ def upsample_conv(input_tensor,concat_tensor,filters,type='resize',kernel_size=3
 def FPN(blocks,type= 'resize'): 
     #force max channels to config.max_depth(default 256) to reduce memory usage
     for i,l in enumerate(blocks):
-        #(l.shape.as_list()[-1] > config.max_depth):
-        blocks[i] = Conv2D(config.max_depth,kernel_size=1,padding='same')(l)
+        if(config.mode =='concat'):
+            if(l.shape.as_list()[-1] > config.max_depth):
+                blocks[i] = Conv2D(config.max_depth,kernel_size=1,padding='same')(l)
+            else:
+                pass
+        else:
+            blocks[i] = Conv2D(config.max_depth,kernel_size=1,padding='same')(l)
  
     # get four 256 channels featuremaps (i.e. P2, P3, P4, P5) from the backbone.
     PN = []
     output_tensor = blocks[0]
     PN.append(output_tensor)
     for i in range(1,len(blocks)):
-        output_tensor = upsample_conv(output_tensor,blocks[i],config.upsample_filters[i-1],type)
+        output_tensor = upsample_conv(output_tensor,blocks[i],config.upsample_filters[i-1],type,mode = config.mode)
         PN.append(output_tensor)
 
     #[P5,P4,P3,P2]

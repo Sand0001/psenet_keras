@@ -429,12 +429,6 @@ class text_porposcal:
         text_boxes = text_boxes - self.offset
         return text_boxes , sub_graphs
 
-
-    def get_text_line_morpholopy_closing(self):
-        text_boxes,sub_graphs = self.get_text_line()
-        self.morphology_closing_combine(text_boxes)
-
-
     def get_text_line_split_cell(self,cell_lines):
         text_boxes,sub_graphs = self.get_text_line()
         text_boxes = self.split_by_cell(text_boxes,sub_graphs,cell_lines)
@@ -573,7 +567,7 @@ def morphology_closing_combine(rects):
                 combine_rects[idx].append(rect)
     
     text_line_rects = [] 
-    print(len(combine_rects))
+    #print(len(combine_rects))
     for c_rts in combine_rects:
         if(c_rts == []):
             continue
