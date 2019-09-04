@@ -605,5 +605,18 @@ class text_porposcal:
                 text_line_boxes = np.vstack((text_line_boxes,rts))
                 
         return text_line_boxes , text_line_sub_rects
-            
+
     def get_text_line(self, cell_lines = [] , combine = False ) :
+        '''
+        combine:形态学找联通区域，对区域内文本块连接
+        cell_lines:通过表格线切分
+        '''
+        text_boxes,sub_graphs = self._get_text_line()
+        text_rects = self.get_rects_by_sub_graphs(sub_graphs)
+
+        if(combine == True):
+            text_boxes , text_rects = self.morphology_closing_combine(text_boxes,sub_graphs)
+        if(len(cell_lines) > 0 ):
+            text_boxes = self.split_by_cell(text_boxes,text_rects,cell_lines)
+        return text_boxes
+
