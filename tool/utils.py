@@ -339,7 +339,6 @@ class text_porposcal:
         max_w = max_w + offset
         return rects , max_w , offset
 
-
     def get_sucession(self,index):
         rect = self.rects[index]
         #以高度作为搜索长度
@@ -362,7 +361,9 @@ class text_porposcal:
         y1 = min(self.rects[index1][3][1],self.rects[index2][3][1])
         
         overlap_v = max(0,y1- y0)/max(height1,height2)
-        return overlap_v
+        overlap_v2  = 1.0 if max(0,y1- y0)/min(height1,height2) > 0.9 else 0.0
+
+        return max(overlap_v , overlap_v2)
 
     def sub_graphs_connected(self):
         sub_graphs=[]
@@ -392,7 +393,7 @@ class text_porposcal:
         y2 = np.mean(text_boxes[:,2,1])
         return [[x1,y1],[x2,y1],[x2,y2],[x1,y2]]
 
-    def get_text_line(self):
+    def _get_text_line(self):
         #在textline对时候某些iou不够对框会跳过去，这个和独立对框是不同对
         #这里申请一个临时存贮对list在保存这些跳过去对框
         for idx ,_ in enumerate(self.rects):
@@ -418,6 +419,8 @@ class text_porposcal:
             if(idx not in set_element):
                 inner_box = self.rects[[idx]]
                 inner_box = self.fit_box_2(inner_box)
+                #如果在其他框的内部则忽略，解决框里有框的情况
+                #未适应的情况，独立的框内有框
                 if self.isInside(inner_box,text_boxes) == False:
                     inner_box = np.expand_dims(np.array(inner_box),axis=0)
                     if(text_boxes.shape[0] ==0):
@@ -429,12 +432,10 @@ class text_porposcal:
         text_boxes = text_boxes - self.offset
         return text_boxes , sub_graphs
 
-    def get_text_line_split_cell(self,cell_lines):
-        text_boxes,sub_graphs = self.get_text_line()
-        text_boxes = self.split_by_cell(text_boxes,sub_graphs,cell_lines)
-        return text_boxes
-
-
+    # def get_text_line_split_cell(self,cell_lines):
+    #     text_boxes,sub_graphs = self.get_text_line()
+    #     text_boxes = self.split_by_cell(text_boxes,sub_graphs,cell_lines)
+    #     return text_boxes
     def isInside(self,inner_rect,out_rects):
         """
             判断相交面积大于等于自身面积则为在内部
@@ -456,8 +457,18 @@ class text_porposcal:
         else:
             return False
 
+    def get_rects_by_sub_graphs(self,sub_graphs):
+        '''
+        sub_graphs是rects的索引编号
+        通过索引返回对应的rects
+        '''
+        text_sub_rects = [] 
+        for sub_graph in sub_graphs:
+            tmp = [self.rects[i] for i in sub_graph]
+            text_sub_rects.append(tmp)
+        return text_sub_rects
 
-    def split_by_cell(self,text_boxes,sub_graphs,cell_lines):
+    def split_by_cell(self,text_boxes,text_rects,cell_lines):
         '''
         根据表格线切分textline。
         get_text_line 得到 text_boxes ,sub_graphs对应每个text_box 由哪些框rect组成
@@ -469,7 +480,7 @@ class text_porposcal:
         #cell_line按x坐标排序
         cell_lines = sorted(cell_lines,key = lambda k:k[0])
         cell_lines = np.array(cell_lines)
-        for text_box , sub_grah in zip(text_boxes , sub_graphs):
+        for text_box , sub_rects in zip(text_boxes , text_rects):
             
             res = [self.isSplit(cell_line , text_box) for cell_line in cell_lines]
             if(np.array(res).any() == False):  #没有切断text_box
@@ -477,7 +488,6 @@ class text_porposcal:
                 continue
                     
             ###切断了text_box###
-            sub_rects = self.rects[sub_grah]
             #小框按x坐标排序
             sub_rects = sorted(sub_rects , key = lambda k:k[0][0],reverse = True )
             s_cell_lines = cell_lines[res]
@@ -529,53 +539,71 @@ class text_porposcal:
                 return True
         return False
 
-def morphology_closing_combine(rects):
-    '''
-    使用闭运算做联通域，对文字块内对rects采用大值text_line
-    '''
-    g = text_porposcal(rects,max_dist=20,scale_h = 1.5,threshold_overlap_v=0.5)
-    rects,_ = g.get_text_line()
-    if(len(rects)<2):
-        return rects
-    #画一个二值图
-    xmax = np.max(rects[:,:,0])
-    ymax = np.max(rects[:,:,1])
-    xmax = xmax + 10 
-    ymax = ymax + 10 
-    bin_img = np.zeros((ymax,xmax),dtype = np.uint8)
-    for rect in rects:
-        cv2.drawContours(bin_img,[rect],-1,(255),-1)
-    #cv2.imwrite('source.jpg',bin_img)
-    #做一个closing
-    cluster_h = rects[:,2,1] - rects[:,0,1]
-    cluster_h = np.reshape(cluster_h,(-1,1))
-    km = KMeans(n_clusters=1).fit(cluster_h)
-    c_h = km.cluster_centers_[0][0]
-    #print('c_h:',c_h)
-    kernel = np.ones((int(c_h),2))
-    closed_img = cv2.morphologyEx(bin_img,cv2.MORPH_CLOSE,kernel)
-    #cv2.imwrite('closing.jpg',closed_img)
-    _,cnts,_ = cv2.findContours(closed_img,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
-    combine_rects = [[] for i in range(len(cnts))]
-    for rect in rects:
-        for idx , cnt in enumerate(cnts):
-            center_x , center_y = (rect[0][0] + rect[2][0]) //2 ,(rect[0][1] + rect[2][1]) //2
-            inside = cv2.pointPolygonTest(cnt,(center_x,center_y),False)
-            #print('inside:',inside)
-            if(inside == 1):
-                #print('rect',rect)
-                combine_rects[idx].append(rect)
-    
-    text_line_rects = [] 
-    #print(len(combine_rects))
-    for c_rts in combine_rects:
-        if(c_rts == []):
-            continue
-        g = text_porposcal(c_rts,max_dist=100,scale_h = 5,threshold_overlap_v=0.5)
-        rts,_ = g.get_text_line()
-        if(text_line_rects ==[]):
-            text_line_rects = rts
-        else:
-            text_line_rects = np.vstack((text_line_rects,rts))
-    return text_line_rects
+
+    def morphology_closing_combine(self, text_boxes , sub_graphs):
+        '''
+        @2019-08-10
+        使用闭运算做联通域，对文字块内对rects采用大值text_line
+        @2019-08-13
+        增加sub_graphs,兼容表格线切分
+        '''
+        origin_rects = self.rects 
+        if(len(text_boxes)<2):
+            return rects,[[0]]
+        #画一个二值图
+        xmax = np.max(text_boxes[:,:,0])
+        ymax = np.max(text_boxes[:,:,1])
+        xmax = xmax + 10 
+        ymax = ymax + 10 
+        bin_img = np.zeros((ymax,xmax),dtype = np.uint8)
+        for box in text_boxes:
+            cv2.drawContours(bin_img,[box],-1,(255),-1)
+        #cv2.imwrite('source.jpg',bin_img)
+        #做一个closing
+        cluster_h = text_boxes[:,2,1] - text_boxes[:,0,1]
+        cluster_h = np.reshape(cluster_h,(-1,1))
+        km = KMeans(n_clusters=1).fit(cluster_h)
+        c_h = km.cluster_centers_[0][0]
+        #print('c_h:',c_h)
+        kernel = np.ones((int(c_h),2))
+        closed_img = cv2.morphologyEx(bin_img,cv2.MORPH_CLOSE,kernel)
+        #cv2.imwrite('closing.jpg',closed_img)
+        _,cnts,_ = cv2.findContours(closed_img,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
+        combine_rects = [[] for i in range(len(cnts))]
+        combine_sub_graphs = [[] for i in range(len(cnts))]
         
+        for box , sub_graph in zip(text_boxes,sub_graphs):
+            for idx , cnt in enumerate(cnts):
+                center_x , center_y = (box[0][0] + box[2][0]) //2 ,(box[0][1] + box[2][1]) //2
+                inside = cv2.pointPolygonTest(cnt,(center_x,center_y),False)
+                #print('inside:',inside)
+                if(inside == 1):
+                    #print('rect',rect)
+                    combine_rects[idx].append(box)
+                    combine_sub_graphs[idx].append(sub_graph)
+
+        
+        text_line_boxes = [] 
+        text_line_sub_rects = []
+        #print(len(combine_rects))
+        for c_rts,c_sub_graph in zip(combine_rects,combine_sub_graphs):
+            if(c_rts == []):
+                continue
+            g = text_porposcal(c_rts,max_dist=100,scale_h = 5,threshold_overlap_v=0.5)
+            rts,s_gs = g._get_text_line()
+            for s_g in s_gs:
+                tmp = [] 
+                for s in s_g:
+                    tmp +=c_sub_graph[s]
+                tmp = [origin_rects[i] for i in tmp]
+                #print('tmp:',tmp)
+                text_line_sub_rects.append(tmp)
+
+            if(text_line_boxes ==[]):
+                text_line_boxes = rts
+            else:
+                text_line_boxes = np.vstack((text_line_boxes,rts))
+                
+        return text_line_boxes , text_line_sub_rects
+            
+    def get_text_line(self, cell_lines = [] , combine = False ) :
