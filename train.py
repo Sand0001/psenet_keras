@@ -59,12 +59,14 @@ shape = (640,640)
 #%%
 gen_train = Generator(train_dir,batch_size = batch_size ,istraining=True,
                         num_classes=num_class,mirror = False,reshape=shape,
-                        trans_color = True,trans_gray=True)
+                        trans_color = True,trans_gray=False,scale = True,
+                        clip = True)
 
 #%%
 gen_test = Generator(test_dir,batch_size = batch_size ,istraining = False,
                     num_classes=num_class,mirror = False,reshape=shape,
-                    trans_color = False,trans_gray=False)
+                    trans_color = False,trans_gray=False,scale = False,
+                    clip = False)
 
 
 #%%
@@ -74,7 +76,7 @@ checkpoint = ModelCheckpoint(r'./tf/finetune-{epoch:02d}.hdf5',
 tb = TensorBoard(log_dir='./logs')
 
 def schedule(epoch):
-    if(epoch < 40):
+    if(epoch < 50):
         return 1e-4
     elif(epoch < 100):
         return 1e-5

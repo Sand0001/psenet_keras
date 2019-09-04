@@ -20,4 +20,5 @@ test/
 .vscode/settings.json
 data/
 *.pb
+*.logs
 logs/
