@@ -74,8 +74,6 @@ def FPN(blocks,type= 'resize'):
         if(config.mode =='concat'):
             if(l.shape.as_list()[-1] > config.max_depth):
                 blocks[i] = Conv2D(config.max_depth,kernel_size=1,padding='same')(l)
-            else:
-                pass
         else:
             blocks[i] = Conv2D(config.max_depth,kernel_size=1,padding='same')(l)
  

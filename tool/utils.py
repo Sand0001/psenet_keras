@@ -192,7 +192,7 @@ def calc_vote_angle(bin_img):
         for line in lines:
             rho,theta = line[0]
             ## 精度0.5
-            angles.append(theta * 180 / np.pi //0.5 * 0.5)
+            angles.append(theta * 180 / np.pi //0.2 * 0.2)
         return Counter(angles).most_common(1)[0][0]
     
     thin_img = bin_img.astype(np.uint8)

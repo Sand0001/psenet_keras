@@ -19,8 +19,8 @@ shape = (None,None,3)
 #%%
 inputs = keras.layers.Input(shape=shape)
 output = psenet(inputs)
-with tf.device('/cpu:0'):
-    model  = keras.models.Model(inputs,output)
+#with tf.device('/cpu:0'):
+model  = keras.models.Model(inputs,output)
 model.summary()
 #%%
 from keras.optimizers import Adam
@@ -51,14 +51,14 @@ from tool.generator import Generator
 import config 
 train_dir = config.MIWI_2018_TRAIN_LABEL_DIR
 test_dir = config.MIWI_2018_TEST_LABEL_DIR
-batch_size = 8
+batch_size = 4
 num_class = 2 
 shape = (640,640)
 
 
 #%%
 gen_train = Generator(train_dir,batch_size = batch_size ,istraining=True,
-                        num_classes=num_class,mirror = False,reshape=shape,
+                        num_classes=num_class,mirror = True,reshape=shape,
                         trans_color = True,trans_gray=False,scale = True,
                         clip = True)
 
@@ -76,9 +76,9 @@ checkpoint = ModelCheckpoint(r'./tf/finetune-{epoch:02d}.hdf5',
 tb = TensorBoard(log_dir='./logs')
 
 def schedule(epoch):
-    if(epoch < 50):
+    if(epoch < 40):
         return 1e-4
-    elif(epoch < 100):
+    elif(epoch < 70):
         return 1e-5
     else:
         return 1e-6

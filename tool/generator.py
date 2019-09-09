@@ -156,8 +156,6 @@ class Generator():
             labels = np.array(labels)
         
             seed = np.random.randint(0,100)
-
-
             if(self.mirror and  seed >90):
                 images = images[:,::-1,::-1,:]
                 labels = labels[:,::-1,::-1,:]
