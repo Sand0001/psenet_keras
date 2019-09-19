@@ -58,7 +58,7 @@ shape = (640,640)
 
 #%%
 gen_train = Generator(train_dir,batch_size = batch_size ,istraining=True,
-                        num_classes=num_class,mirror = True,reshape=shape,
+                        num_classes=num_class,mirror = False,reshape=shape,
                         trans_color = True,trans_gray=False,scale = True,
                         clip = True)
 
