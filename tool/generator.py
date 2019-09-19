@@ -33,18 +33,19 @@ class Generator():
     def num_samples(self):
         return len(self.imagelist)
 
-    def list_dir(self,dir):
+    def list_dir(self,dirs):
 
         image =[]
         npy =[]
-
-        imagesfile = glob.glob(os.path.join(dir,'*.jpg'))
-        for i in imagesfile:
-            npyfile = os.path.join(dir,'.'.join(os.path.basename(i).split('.')[:-1])+'.npy')
-            imagefile = os.path.join(dir,i)
-            if(os.path.exists(npyfile)):
-                image.append(imagefile)
-                npy.append(npyfile)
+        #to do 支持多文件夹
+        for dir in dirs:
+            imagesfile = glob.glob(os.path.join(dir,'*.jpg'))
+            for i in imagesfile:
+                npyfile = os.path.join(dir,'.'.join(os.path.basename(i).split('.')[:-1])+'.npy')
+                imagefile = os.path.join(dir,i)
+                if(os.path.exists(npyfile)):
+                    image.append(imagefile)
+                    npy.append(npyfile)
                 
         return np.array(image),np.array(npy)
 
