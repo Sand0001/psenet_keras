@@ -21,4 +21,5 @@ test/
 data/
 *.pb
 *.logs
+*.log
 logs/
