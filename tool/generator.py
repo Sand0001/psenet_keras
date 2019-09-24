@@ -8,12 +8,12 @@ import numpy as np
 import cv2
 import config
 import traceback
-from tool.utils import BatchIndices
-
+from tool.utils import BatchIndices , warpAffine_Padded
 
 class Generator():
     def __init__(self,dir,batch_size = 2 , istraining = True,num_classes = 2,
-                 trans_color = True,trans_gray = True,mirror=False,scale=True,clip=True,reshape=(640,640)):
+                 trans_color = True,trans_gray = True,mirror=False,scale=True,
+                 angle = 10 , clip=True,reshape=(640,640)):
         self.dir = dir 
         self.lock = threading.Lock()
         self.batch_size = batch_size
@@ -21,6 +21,7 @@ class Generator():
         self.num_classes = num_classes
         self.mirror = mirror
         self.scale = scale
+        self.angle = angle 
         self.reshape = reshape  #(h,w)
         self.clip = clip
         self.trans_color = trans_color
@@ -37,7 +38,7 @@ class Generator():
 
         image =[]
         npy =[]
-        #to do 支持多文件夹
+        #支持多文件夹
         for dir in dirs:
             imagesfile = glob.glob(os.path.join(dir,'*.jpg'))
             for i in imagesfile:
@@ -77,6 +78,19 @@ class Generator():
         img = cv2.resize(img,(w,h),interpolation=cv2.INTER_AREA)
         return img,lns
 
+    def random_rotate(self,img,label,angle):
+        '''
+        随机旋转
+        '''
+        angle = np.random.uniform(-angle,angle)
+        #1.计算旋转矩阵
+        #2.旋转image和label
+        h,w = img.shape[0:2]
+        offset_M , padded_w , padded_h = warpAffine_Padded(h,w,angle,mode ='angle')
+        rotate_img = cv2.warpAffine(img,offset_M,(padded_w,padded_h),flags=cv2.INTER_LINEAR,borderValue=(255,255,255))
+        rotate_label = cv2.warpAffine(label,offset_M,(padded_w,padded_h),flags=cv2.INTER_NEAREST,borderValue=0)
+        return rotate_img,rotate_label
+
     def trans_color_image(self,img):
         '''
         颜色通道转换
@@ -97,7 +111,7 @@ class Generator():
         dh = max(h,ih)
         dw = max(w,iw)
         newimg = np.ones((dh,dw,img.shape[2]),dtype = np.uint8)*128
-        newlabel = np.zeros((dh,dw,label.shape[2]))
+        newlabel = np.zeros((dh,dw,label.shape[2]),dtype = np.uint8)
         ty = (dh - h )//2
         tx = (dw - w)//2
         newimg[ty:ty+h,tx:tx+w,:] = img
@@ -129,6 +143,9 @@ class Generator():
             for i,j in zip(self.labellist[idx],self.imagelist[idx]):
                 l = np.load(i).astype(np.uint8)
                 img = cv2.imread(j)
+
+                if(self.angle):
+                    img,l = self.random_rotate(img,l,self.angle)
                 #随机缩放
                 if(self.scale):
                     scale = self.rand(config.data_gen_min_scales,config.data_gen_max_scales)
@@ -173,6 +190,10 @@ class Generator():
             print('imageshape',img.shape)
             traceback.print_exc()
             self.__next__()
+
+
+
+
 
 ##def test():
 #gen = Generator(config.MIWI_2018_TEST_LABEL_DIR)
