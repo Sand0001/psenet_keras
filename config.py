@@ -24,12 +24,16 @@ MIWI_2018_TEST_LABEL_DIR = r'/data/mahuichao/PSENET/data/MTWI_2018/test_label'
 # DIP_TRAIN_LABEL_DIR = r'/data/mahuichao/PSENET/data/TEXT_SHENGCHAN190724/train'
 # DIP_TEST_LABEL_DIR = r'/data/mahuichao/PSENET/data/TEXT_SHENGCHAN190724/test'
 
-DIP_IMG_DIR_TEXT_ZIXUAN = r'/Users/mahuichao/Documents/tmp/text_zixuan'
-DIP_JSON_DIR = r'/Users/mahuichao/Documents/tmp/text_zixuan/output_json'
-DIP_TRAIN_LABEL_DIR = r'/Users/mahuichao/Documents/tmp/text_zixuan/train'
-DIP_TEST_LABEL_DIR = r'/Users/mahuichao/Documents/tmp/text_zixuan/test'
+DIP_IMG_DIR_TEXT_ZIXUAN = r'/data/mahuichao/PSENET/data/text_zixuan/image'
+DIP_JSON_DIR_TEXT_ZIXUAN = r'/data/mahuichao/PSENET/data/text_zixuan/label'
+DIP_TRAIN_LABEL_DIR_TEXT_ZIXUAN = r'/data/mahuichao/PSENET/data/text_zixuan/train'
+DIP_TEST_LABEL_DIR_TEXT_ZIXUAN = r'/data/mahuichao/PSENET/data/text_zixuan/test'
 
 
+DIP_IMG_DIR_TEXT_ZIXUAN2 = r'/data/mahuichao/PSENET/data/text_zixuan2/image'
+DIP_JSON_DIR_TEXT_ZIXUAN2 = r'/data/mahuichao/PSENET/data/text_zixuan2/label'
+DIP_TRAIN_LABEL_DIR_TEXT_ZIXUAN2 = r'/data/mahuichao/PSENET/data/text_zixuan2/train'
+DIP_TEST_LABEL_DIR_TEXT_ZIXUAN2 = r'/data/mahuichao/PSENET/data/text_zixuan2/test'
 
 label_to_id = {(255,255,255):0,(0,0,255):1}
 
