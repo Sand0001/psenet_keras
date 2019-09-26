@@ -101,9 +101,9 @@ checkpoint = ModelCheckpoint(r'./tf/finetune-{epoch:02d}.hdf5',
 tb = TensorBoard(log_dir='./logs',update_freq = 20)
 
 def schedule(epoch):
-    if(epoch < 100):
+    if(epoch < 60):
         return 1e-4
-    elif(epoch < 150):
+    elif(epoch < 120):
         return 1e-5
     else:
         return 1e-6
