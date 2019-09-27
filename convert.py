@@ -1,7 +1,7 @@
 
 import os 
 import config 
-os.environ['CUDA_VISIBLE_DEVICES'] = config.visiable_gpu
+os.environ['CUDA_VISIBLE_DEVICES'] = '4,7'
 
 #%%
 import keras.backend.tensorflow_backend as KTF
@@ -37,5 +37,5 @@ adam = Adam(1e-4)
 #%%
 ious = build_iou([0,1],['bk','txt'])
 multi_model = multi_gpu_model(model)
-multi_model.load_weights('')
+multi_model.load_weights('./tf/finetune-116.hdf5')
 model.save_weights('single.hdf5')
