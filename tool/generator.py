@@ -13,7 +13,7 @@ from tool.utils import BatchIndices , warpAffine_Padded
 class Generator():
     def __init__(self,dir,batch_size = 2 , istraining = True,num_classes = 2,
                  trans_color = True,trans_gray = True,mirror=False,scale=True,
-                 angle = 10 , clip=True,reshape=(640,640)):
+                 angle = 10 , clip=True,reshape=(640,640),max_size = None:
         self.dir = dir 
         self.lock = threading.Lock()
         self.batch_size = batch_size
@@ -28,6 +28,7 @@ class Generator():
         self.trans_gray = trans_gray
         self.imagelist,self.labellist = self.list_dir(self.dir)
         self.batch_idx = BatchIndices(self.imagelist.shape[0],self.batch_size,self.shuffle)
+        self.max_size = max_size 
     def num_classes(self):
         return self.num_classes
 
@@ -60,6 +61,36 @@ class Generator():
             lns[:,:,c] =cv2.resize(label[:,:,c],(lreshape[1],lreshape[0]),interpolation=cv2.INTER_NEAREST)
         img = cv2.resize(img,(self.reshape[1],self.reshape[0]),interpolation=cv2.INTER_AREA)
         return img,lns
+
+    def reshape_max_size(self,img,label,max_size):
+            MIN_LEN = 32
+            MAX_LEN = max_size
+            h, w = img.shape[0:2]
+            if(w<h):
+                if(w<MIN_LEN):
+                    scale = 1.0 * MIN_LEN / w
+                    h = h * scale 
+                    w = MIN_LEN
+                elif(h>MAX_LEN):
+                    scale = 1.0 * MAX_LEN / h 
+                    w = w * scale if w * scale > MIN_LEN else MIN_LEN
+                    h = MAX_LEN
+            elif(h<=w ):
+                if(h<MIN_LEN):
+                    scale = 1.0 * MIN_LEN / h
+                    w = scale * w
+                    h = MIN_LEN 
+                elif(w>MAX_LEN):
+                    scale = 1.0 * MAX_LEN / w
+                    h = scale * h if scale * h >  MIN_LEN else MIN_LEN
+                    w = MAX_LEN
+
+            w = int(w //32 * 32)
+            h = int(h//32 * 32)
+            img,label = self.reshape_image(img,label,(h,w))
+            return img,label
+
+
 
     def scale_image(self,img,label,scalex,scaley):
         '''
@@ -167,6 +198,10 @@ class Generator():
                 #reshape到训练尺寸
                 if(self.reshape):
                     img,l = self.reshape_image(img,l,self.reshape)
+
+                if(self.maxsize):
+                    img,l = self.reshape_max_size(img,l,self.max_size)
+
                 images.append(img)
                 labels.append(l)
 
