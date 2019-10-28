@@ -35,6 +35,18 @@ DIP_JSON_DIR_TEXT_ZIXUAN2 = r'/data/mahuichao/PSENET/data/text_zixuan2/label'
 DIP_TRAIN_LABEL_DIR_TEXT_ZIXUAN2 = r'/data/mahuichao/PSENET/data/text_zixuan2/train'
 DIP_TEST_LABEL_DIR_TEXT_ZIXUAN2 = r'/data/mahuichao/PSENET/data/text_zixuan2/test'
 
+DIP_IMG_DIR_TEXT_ZIXUAN3 = r'/data/mahuichao/PSENET/data/text_zixuan3/image'
+DIP_JSON_DIR_TEXT_ZIXUAN3 = r'/data/mahuichao/PSENET/data/text_zixuan3/label'
+DIP_TRAIN_LABEL_DIR_TEXT_ZIXUAN3 = r'/data/mahuichao/PSENET/data/text_zixuan3/train'
+DIP_TEST_LABEL_DIR_TEXT_ZIXUAN3 = r'/data/mahuichao/PSENET/data/text_zixuan3/test'
+
+DIP_IMG_DIR_TEXT_ZIXUAN4 = r'/data/mahuichao/PSENET/data/text_zixuan4/image'
+DIP_JSON_DIR_TEXT_ZIXUAN4 = r'/data/mahuichao/PSENET/data/text_zixuan4/label'
+DIP_TRAIN_LABEL_DIR_TEXT_ZIXUAN4 = r'/data/mahuichao/PSENET/data/text_zixuan4/train'
+DIP_TEST_LABEL_DIR_TEXT_ZIXUAN4 = r'/data/mahuichao/PSENET/data/text_zixuan4/test'
+
+
+
 label_to_id = {(255,255,255):0,(0,0,255):1}
 
 data_gen_min_scales = 0.8
