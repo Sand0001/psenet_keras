@@ -135,17 +135,17 @@ def create_dataset():
     gen_dataset(test_data,config.DIP_TEST_LABEL_DIR)
 
 if __name__=='__main__':
-    data = read_dataset(config.DIP_JSON_DIR_TEXT_ZIXUAN2,config.DIP_IMG_DIR_TEXT_ZIXUAN2)
+    data = read_dataset(config.DIP_JSON_DIR_TEXT_ZIXUAN3,config.DIP_IMG_DIR_TEXT_ZIXUAN3)
     #split trian and test data
     train_num = int(len(data) * 0.9)
     train_data = {key:data[key] for i,key in enumerate(data) if i<train_num }
     test_data  = {key:data[key] for i,key in enumerate(data) if i>=train_num }
 
-    del_allfile(config.DIP_TRAIN_LABEL_DIR_TEXT_ZIXUAN2)
-    del_allfile(config.DIP_TEST_LABEL_DIR_TEXT_ZIXUAN2)
+    del_allfile(config.DIP_TRAIN_LABEL_DIR_TEXT_ZIXUAN3)
+    del_allfile(config.DIP_TEST_LABEL_DIR_TEXT_ZIXUAN3)
 
     with mp.Pool(processes=3) as pool:
-        pool.map(gen_dataset,zip(train_data.items(),repeat(config.DIP_TRAIN_LABEL_DIR_TEXT_ZIXUAN2)))
-        pool.map(gen_dataset,zip(test_data.items(),repeat(config.DIP_TEST_LABEL_DIR_TEXT_ZIXUAN2)))
+        pool.map(gen_dataset,zip(train_data.items(),repeat(config.DIP_TRAIN_LABEL_DIR_TEXT_ZIXUAN3)))
+        pool.map(gen_dataset,zip(test_data.items(),repeat(config.DIP_TEST_LABEL_DIR_TEXT_ZIXUAN3)))
 
 

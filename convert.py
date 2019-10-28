@@ -37,5 +37,5 @@ adam = Adam(1e-4)
 #%%
 ious = build_iou([0,1],['bk','txt'])
 multi_model = multi_gpu_model(model)
-multi_model.load_weights('./tf/finetune-116.hdf5')
-model.save_weights('single.hdf5')
+multi_model.load_weights('./tf/finetune-150.hdf5')
+model.save_weights('single1009.hdf5')
