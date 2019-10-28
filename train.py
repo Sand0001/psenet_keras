@@ -90,7 +90,7 @@ gen_train = Generator(train_dir,batch_size = batch_size ,istraining=True,
 
 #%%
 gen_test = Generator(test_dir,batch_size = batch_size ,istraining = False,
-                    num_classes=num_class,mirror = False,reshape=shape,
+                    num_classes=num_class,mirror = False,reshape=None,
                     trans_color = False,trans_gray=False,scale = False,
                     clip = False,angle = None,max_size = 1280)
 
