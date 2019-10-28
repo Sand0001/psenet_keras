@@ -59,7 +59,7 @@ class Generator():
         lns = np.zeros((lreshape[0],lreshape[1],config.n))
         for c in range(config.n):
             lns[:,:,c] =cv2.resize(label[:,:,c],(lreshape[1],lreshape[0]),interpolation=cv2.INTER_NEAREST)
-        img = cv2.resize(img,(self.reshape[1],self.reshape[0]),interpolation=cv2.INTER_AREA)
+        img = cv2.resize(img,(shape[1],shape[0]),interpolation=cv2.INTER_AREA)
         return img,lns
 
     def reshape_max_size(self,img,label,max_size):
