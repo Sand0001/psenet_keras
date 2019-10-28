@@ -199,7 +199,7 @@ class Generator():
                 if(self.reshape):
                     img,l = self.reshape_image(img,l,self.reshape)
 
-                if(self.maxsize):
+                if(self.max_size):
                     img,l = self.reshape_max_size(img,l,self.max_size)
 
                 images.append(img)
