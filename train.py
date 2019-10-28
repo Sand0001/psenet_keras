@@ -52,30 +52,31 @@ import config
 train_dir = [config.MIWI_2018_TRAIN_LABEL_DIR,
              config.DIP_TRAIN_LABEL_DIR_TEXT_ZIXUAN,
              config.DIP_TRAIN_LABEL_DIR_TEXT_ZIXUAN2,
-             config.DIP_TEST_LABEL_DIR_TEXT_ZIXUAN,
-             config.DIP_TEST_LABEL_DIR_TEXT_ZIXUAN2,
+             config.DIP_TEST_LABEL_DIR_TEXT_ZIXUAN3,
+             config.DIP_TEST_LABEL_DIR_TEXT_ZIXUAN4,
              config.DIP_TRAIN_LABEL_DIR_TEXT_ZIXUAN,
              config.DIP_TRAIN_LABEL_DIR_TEXT_ZIXUAN2,
-             config.DIP_TEST_LABEL_DIR_TEXT_ZIXUAN,
-             config.DIP_TEST_LABEL_DIR_TEXT_ZIXUAN2,
+             config.DIP_TEST_LABEL_DIR_TEXT_ZIXUAN3,
+             config.DIP_TEST_LABEL_DIR_TEXT_ZIXUAN4,
              config.DIP_TRAIN_LABEL_DIR_TEXT_ZIXUAN,
              config.DIP_TRAIN_LABEL_DIR_TEXT_ZIXUAN2,
-             config.DIP_TEST_LABEL_DIR_TEXT_ZIXUAN,
-             config.DIP_TEST_LABEL_DIR_TEXT_ZIXUAN2,
+             config.DIP_TEST_LABEL_DIR_TEXT_ZIXUAN3,
+             config.DIP_TEST_LABEL_DIR_TEXT_ZIXUAN4,
              config.DIP_TRAIN_LABEL_DIR_TEXT_ZIXUAN,
              config.DIP_TRAIN_LABEL_DIR_TEXT_ZIXUAN2,
-             config.DIP_TEST_LABEL_DIR_TEXT_ZIXUAN,
-             config.DIP_TEST_LABEL_DIR_TEXT_ZIXUAN2,
+             config.DIP_TEST_LABEL_DIR_TEXT_ZIXUAN3,
+             config.DIP_TEST_LABEL_DIR_TEXT_ZIXUAN4,
              config.DIP_TRAIN_LABEL_DIR_TEXT_ZIXUAN,
              config.DIP_TRAIN_LABEL_DIR_TEXT_ZIXUAN2,
-             config.DIP_TEST_LABEL_DIR_TEXT_ZIXUAN,
-             config.DIP_TEST_LABEL_DIR_TEXT_ZIXUAN2]
+             config.DIP_TEST_LABEL_DIR_TEXT_ZIXUAN3,
+             config.DIP_TEST_LABEL_DIR_TEXT_ZIXUAN4,
+             ]
 
 test_dir = [config.MIWI_2018_TEST_LABEL_DIR,
             config.DIP_TRAIN_LABEL_DIR_TEXT_ZIXUAN,
             config.DIP_TRAIN_LABEL_DIR_TEXT_ZIXUAN2,
-            config.DIP_TEST_LABEL_DIR_TEXT_ZIXUAN,
-            config.DIP_TEST_LABEL_DIR_TEXT_ZIXUAN2]
+            config.DIP_TEST_LABEL_DIR_TEXT_ZIXUAN3,
+            config.DIP_TEST_LABEL_DIR_TEXT_ZIXUAN4,]
 batch_size = 8
 num_class = 2 
 shape = (640,640)
@@ -84,21 +85,21 @@ shape = (640,640)
 #%%
 gen_train = Generator(train_dir,batch_size = batch_size ,istraining=True,
                         num_classes=num_class,mirror = False,reshape=shape,
-                        trans_color = True,trans_gray=False,scale = True,
-                        clip = True,angle = 10)
+                        trans_color = True,trans_gray=True,scale = True,
+                        clip = True,angle = 10,max_size = None)
 
 #%%
 gen_test = Generator(test_dir,batch_size = batch_size ,istraining = False,
                     num_classes=num_class,mirror = False,reshape=shape,
                     trans_color = False,trans_gray=False,scale = False,
-                    clip = False,angle = None)
+                    clip = False,angle = None,max_size = 1280)
 
 
 #%%
 from keras.callbacks import ModelCheckpoint,TensorBoard,LearningRateScheduler
 checkpoint = ModelCheckpoint(r'./tf/finetune-{epoch:02d}.hdf5',
                            save_weights_only=True)
-tb = TensorBoard(log_dir='./logs',update_freq = 20)
+tb = TensorBoard(log_dir='./logs')
 
 def schedule(epoch):
     if(epoch < 60):
