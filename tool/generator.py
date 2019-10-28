@@ -13,7 +13,7 @@ from tool.utils import BatchIndices , warpAffine_Padded
 class Generator():
     def __init__(self,dir,batch_size = 2 , istraining = True,num_classes = 2,
                  trans_color = True,trans_gray = True,mirror=False,scale=True,
-                 angle = 10 , clip=True,reshape=(640,640),max_size = None:
+                 angle = 10 , clip=True,reshape=(640,640),max_size = None):
         self.dir = dir 
         self.lock = threading.Lock()
         self.batch_size = batch_size
