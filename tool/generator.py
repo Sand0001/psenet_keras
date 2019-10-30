@@ -94,7 +94,7 @@ class Generator():
 
     def scale_image(self,img,label,scalex,scaley):
         '''
-        缩放并保证短边最少是640
+        缩放并保证短边最少是640  , 这个地方似乎不太合理？
         '''
         h,w = img.shape[0:2]
         h = int(h*scaley)
