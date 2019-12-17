@@ -88,10 +88,10 @@ class SeamClone():
             pic_seal_list = []
 
             random.shuffle(picList)
-            print('int(pic_seal_num*1.0//all_pic_num*len(picList))',int(pic_seal_num*1.0//all_pic_num*len(picList)))
+            print('int(pic_seal_num*1.0/all_pic_num*len(picList))',int(pic_seal_num*1.0/all_pic_num*len(picList)))
             print('len(pic_seal_list)',len(pic_seal_list))
             # for i in range(int(pic_seal_num*1.0//all_pic_num*len(picList))):
-            while (len(pic_seal_list)<int(pic_seal_num*1.0//all_pic_num*len(picList))):
+            while (len(pic_seal_list)<int(pic_seal_num*1.0/all_pic_num*len(picList))):
                 pic = random.choice(picList)
 
 
@@ -165,14 +165,15 @@ if __name__ == '__main__':
     picList_all = []
     pic_info = {}
     for path in os.listdir(data_path):
-        if 'test_zixuan' in path:
+        if 'text_zixuan' in path:
             if data_path[-1] != '/':
                 data_path = data_path + '/'
             pic_path = data_path+path+'/image'
             # pic_path = data_path+path
             picList = os.listdir(pic_path)
-            pic_info = {pic_path:picList}
+            pic_info[pic_path] = picList
             num += len(picList)
+    print('num',num)
     SeamClone.semless_clone(pic_info,pic_seal_num,num)
 
 
