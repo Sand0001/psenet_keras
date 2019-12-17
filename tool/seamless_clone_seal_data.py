@@ -87,23 +87,13 @@ class SeamClone():
 
         for key in picInfo:
             picList = picInfo[key]
+            print('现在处理{}文件夹,共有图片{}张'.format(key,len(picList)))
             pic_seal_list = []
-
-            random.shuffle(picList)
-            print('int(pic_seal_num*1.0/all_pic_num*len(picList))',int(pic_seal_num*1.0/all_pic_num*len(picList)))
-            print('len(pic_seal_list)',len(pic_seal_list))
-            # for i in range(int(pic_seal_num*1.0//all_pic_num*len(picList))):
-            # while (len(pic_seal_list)<int(pic_seal_num*1.0/all_pic_num*len(picList))):
-            # while (len(pic_seal_list)<len(picList)):
-            #     pic = random.choice(picList)
-            #     if pic not in pic_seal_list:
-                    #print('i',i)
-
+            #random.shuffle(picList)
             for pic in picList:
                 if 'jpg'  in pic or 'png' in pic:
                     img = cv2.imread(os.path.join(key,pic))
                     height, width = img.shape[0:2]
-
                     seal_pic = random.choice(seal_list)
                     try:
                         random_style = random.randint(0,5)
@@ -123,7 +113,6 @@ class SeamClone():
                         if self.prob(0.5):
 
                             angle = random.randint(0,360)
-                            print('rotate',angle)
                             mask = self.rotate(mask,angle,mask = True)
                             seal_img = self.rotate(seal_img,angle)
                             #binary = self.dilate(binary)
