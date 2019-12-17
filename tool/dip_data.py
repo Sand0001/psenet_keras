@@ -13,10 +13,12 @@ def read_dataset(json_file_dir,image_dir):
         image_dir: 图片所在路径
     '''
     json_files_path = glob.glob(os.path.join(json_file_dir,'*.json'))
+    json_files_path = os.listdir(json_file_dir)
     dataset = {}
     for filepath in json_files_path:
-        with open(filepath) as f:
-            js = json.load(f)
+        f = open(os.path.join(json_file_dir,filepath),'r').readlines()[0]
+        #with open(filepath) as f:
+        js = json.loads(f)
         imgfilename = js['path']
         imgfilename = os.path.join(image_dir,os.path.basename(imgfilename))
         bndboxes = js['bndbox'] 
