@@ -91,10 +91,9 @@ class SeamClone():
             print('int(pic_seal_num*1.0/all_pic_num*len(picList))',int(pic_seal_num*1.0/all_pic_num*len(picList)))
             print('len(pic_seal_list)',len(pic_seal_list))
             # for i in range(int(pic_seal_num*1.0//all_pic_num*len(picList))):
-            while (len(pic_seal_list)<int(pic_seal_num*1.0/all_pic_num*len(picList))):
+            # while (len(pic_seal_list)<int(pic_seal_num*1.0/all_pic_num*len(picList))):
+            while (len(pic_seal_list)<len(picList)):
                 pic = random.choice(picList)
-
-
                 if pic not in pic_seal_list:
                     #print('i',i)
 
