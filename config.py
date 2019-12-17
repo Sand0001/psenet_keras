@@ -45,6 +45,12 @@ DIP_JSON_DIR_TEXT_ZIXUAN4 = r'/data/mahuichao/PSENET/data/text_zixuan4/label'
 DIP_TRAIN_LABEL_DIR_TEXT_ZIXUAN4 = r'/data/mahuichao/PSENET/data/text_zixuan4/train'
 DIP_TEST_LABEL_DIR_TEXT_ZIXUAN4 = r'/data/mahuichao/PSENET/data/text_zixuan4/test'
 
+###这是seal 数据
+DIP_IMG_DIR_TEXT_ZIXUAN5 = r'/data/mahuichao/PSENET/data/text_zixuan5/image'
+DIP_JSON_DIR_TEXT_ZIXUAN5 = r'/data/mahuichao/PSENET/data/text_zixuan5/label'
+DIP_TRAIN_LABEL_DIR_TEXT_ZIXUAN5 = r'/data/mahuichao/PSENET/data/text_zixuan5/train'
+DIP_TEST_LABEL_DIR_TEXT_ZIXUAN5 = r'/data/mahuichao/PSENET/data/text_zixuan5/test'
+
 
 
 label_to_id = {(255,255,255):0,(0,0,255):1}

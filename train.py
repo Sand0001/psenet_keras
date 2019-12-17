@@ -70,13 +70,16 @@ train_dir = [#config.MIWI_2018_TRAIN_LABEL_DIR,
              config.DIP_TRAIN_LABEL_DIR_TEXT_ZIXUAN2,
              config.DIP_TEST_LABEL_DIR_TEXT_ZIXUAN3,
              config.DIP_TEST_LABEL_DIR_TEXT_ZIXUAN4,
+
+                config.DIP_TEST_LABEL_DIR_TEXT_ZIXUAN5,
              ]
 
 test_dir = [#config.MIWI_2018_TEST_LABEL_DIR,
             config.DIP_TRAIN_LABEL_DIR_TEXT_ZIXUAN,
             config.DIP_TRAIN_LABEL_DIR_TEXT_ZIXUAN2,
             config.DIP_TEST_LABEL_DIR_TEXT_ZIXUAN3,
-            config.DIP_TEST_LABEL_DIR_TEXT_ZIXUAN4,]
+            config.DIP_TEST_LABEL_DIR_TEXT_ZIXUAN4,
+            config.DIP_TEST_LABEL_DIR_TEXT_ZIXUAN5,]
 batch_size = 8
 num_class = 2 
 shape = (640,640)
