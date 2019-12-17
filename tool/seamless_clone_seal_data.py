@@ -92,66 +92,66 @@ class SeamClone():
             print('len(pic_seal_list)',len(pic_seal_list))
             # for i in range(int(pic_seal_num*1.0//all_pic_num*len(picList))):
             # while (len(pic_seal_list)<int(pic_seal_num*1.0/all_pic_num*len(picList))):
-            while (len(pic_seal_list)<len(picList)):
-                pic = random.choice(picList)
-                if pic not in pic_seal_list:
+            # while (len(pic_seal_list)<len(picList)):
+            #     pic = random.choice(picList)
+            #     if pic not in pic_seal_list:
                     #print('i',i)
 
-                #for pic in picList:
-                    if 'jpg'  in pic or 'png' in pic:
-                        img = cv2.imread(os.path.join(key,pic))
-                        height, width = img.shape[0:2]
+            for pic in picList:
+                if 'jpg'  in pic or 'png' in pic:
+                    img = cv2.imread(os.path.join(key,pic))
+                    height, width = img.shape[0:2]
 
-                        seal_pic = random.choice(seal_list)
-                        try:
-                            random_style = random.randint(0,5)
-                            if random_style ==1 :
-                                seal_img = cv2.imread(os.path.join(self.seal_path,seal_pic))[:,:,[2,1,0]]
+                    seal_pic = random.choice(seal_list)
+                    try:
+                        random_style = random.randint(0,5)
+                        if random_style ==1 :
+                            seal_img = cv2.imread(os.path.join(self.seal_path,seal_pic))[:,:,[2,1,0]]
 
-                            elif random_style == 2:
-                                seal_img = cv2.imread(os.path.join(self.seal_path,seal_pic),cv2.IMREAD_GRAYSCALE)
-                                seal_img = cv2.cvtColor(seal_img,cv2.COLOR_GRAY2BGR)
-                            else:
-                                seal_img = cv2.imread(os.path.join(self.seal_path, seal_pic))
+                        elif random_style == 2:
+                            seal_img = cv2.imread(os.path.join(self.seal_path,seal_pic),cv2.IMREAD_GRAYSCALE)
+                            seal_img = cv2.cvtColor(seal_img,cv2.COLOR_GRAY2BGR)
+                        else:
+                            seal_img = cv2.imread(os.path.join(self.seal_path, seal_pic))
 
-                            #binary = self.rotate(binary)
-                            #ret, binary = cv2.threshold(~seal_img[:, :, 2], 30, 255, cv2.THRESH_BINARY)  # 二值化求边缘
+                        #binary = self.rotate(binary)
+                        #ret, binary = cv2.threshold(~seal_img[:, :, 2], 30, 255, cv2.THRESH_BINARY)  # 二值化求边缘
 
-                            mask = 255 * np.ones(seal_img.shape, seal_img.dtype)
-                            if self.prob(0.5):
+                        mask = 255 * np.ones(seal_img.shape, seal_img.dtype)
+                        if self.prob(0.5):
 
-                                angle = random.randint(0,360)
-                                print('rotate',angle)
-                                mask = self.rotate(mask,angle,mask = True)
-                                seal_img = self.rotate(seal_img,angle)
-                                #binary = self.dilate(binary)
-                            height_seal ,width_seal = seal_img.shape[:2]
+                            angle = random.randint(0,360)
+                            print('rotate',angle)
+                            mask = self.rotate(mask,angle,mask = True)
+                            seal_img = self.rotate(seal_img,angle)
+                            #binary = self.dilate(binary)
+                        height_seal ,width_seal = seal_img.shape[:2]
 
-                            # 求图片粘贴的位置
-                            # 随机x，y 框放的位置
-                            range_x = random.randint(0, width - width_seal)
-                            range_y = random.randint(0, height - height_seal)
+                        # 求图片粘贴的位置
+                        # 随机x，y 框放的位置
+                        range_x = random.randint(0, width - width_seal)
+                        range_y = random.randint(0, height - height_seal)
 
-                            # 由随机xy 计算center
-                            center = (range_x + width_seal // 2, range_y + height_seal // 2)
-                            mixed_clone = cv2.seamlessClone(seal_img, img, mask, (center[0], center[1]), cv2.MIXED_CLONE)
-                            ret, binary = cv2.threshold(~seal_img[:, :, 2], 30, 255, cv2.THRESH_BINARY)  # 二值化求边缘
+                        # 由随机xy 计算center
+                        center = (range_x + width_seal // 2, range_y + height_seal // 2)
+                        mixed_clone = cv2.seamlessClone(seal_img, img, mask, (center[0], center[1]), cv2.MIXED_CLONE)
+                        ret, binary = cv2.threshold(~seal_img[:, :, 2], 30, 255, cv2.THRESH_BINARY)  # 二值化求边缘
 
-                            mask_coor = np.argwhere(binary > 200)
-                            for i in mask_coor:
-                                try:
-                                    img[range_y + i[0], range_x + i[1]] = mixed_clone[range_y + i[0], range_x + i[1]]
+                        mask_coor = np.argwhere(binary > 200)
+                        for i in mask_coor:
+                            try:
+                                img[range_y + i[0], range_x + i[1]] = mixed_clone[range_y + i[0], range_x + i[1]]
 
-                                except Exception as e:
-                                    print(e)
-                                    continue
-                            cv2.imwrite(os.path.join(key,pic),img)
-                            self.process_num += 1
-                            print('已经处理完成图片 {} 张'.format(self.process_num))
+                            except Exception as e:
+                                print(e)
+                                continue
+                        cv2.imwrite(os.path.join(key,pic),img)
+                        self.process_num += 1
+                        print('已经处理完成图片 {} 张'.format(self.process_num))
 
-                        except:
-                            continue
-                    pic_seal_list.append(pic)
+                    except:
+                        continue
+                pic_seal_list.append(pic)
 
 
 if __name__ == '__main__':
