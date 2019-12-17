@@ -8,6 +8,8 @@ class SeamClone():
     def __init__(self):
         self.pic_path = '/fengjing/test_img/eng_tmp/image'
         self.seal_path = '/data2/fengjing/pse_data/fg'
+        # self.seal_path = '/Users/feng/Downloads/new_bg/yinzhang'
+
         self.rotate_or_not = True
         self.process_num = 0
 
@@ -158,7 +160,7 @@ if __name__ == '__main__':
     import sys
     SeamClone = SeamClone()
     data_path = sys.argv[1]
-    #data_path = '/fengjing/test_img/eng_tmp'
+    # data_path = '/fengjing/test_img/eng_tmp'
     num = 0
     pic_seal_num = 110
     picList_all = []
