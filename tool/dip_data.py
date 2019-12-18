@@ -16,9 +16,12 @@ def read_dataset(json_file_dir,image_dir):
     json_files_path = os.listdir(json_file_dir)
     dataset = {}
     for filepath in json_files_path:
-        f = open(os.path.join(json_file_dir,filepath),'r').readlines()[0]
-        #with open(filepath) as f:
-        js = json.loads(f)
+        try:
+            f = open(os.path.join(json_file_dir,filepath),'r').readlines()[0]
+            #with open(filepath) as f:
+            js = json.loads(f)
+        except:
+            continue
         imgfilename = js['path']
         imgfilename = os.path.join(image_dir,os.path.basename(imgfilename))
         bndboxes = js['bndbox'] 
