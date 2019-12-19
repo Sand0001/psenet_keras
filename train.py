@@ -28,7 +28,7 @@ from models.loss import build_loss
 from models.metrics import build_iou,mean_iou
 from keras.utils import multi_gpu_model
 
-model.load_weights('./tf/single0929.hdf5')
+# model.load_weights('./tf/single0929.hdf5')
 
 #%%
 adam = Adam(1e-4)
@@ -49,37 +49,37 @@ from tool.generator import Generator
 
 #%%
 import config 
-train_dir = [#config.MIWI_2018_TRAIN_LABEL_DIR,
-             # config.DIP_TRAIN_LABEL_DIR_TEXT_ZIXUAN,
-             # config.DIP_TRAIN_LABEL_DIR_TEXT_ZIXUAN2,
-             # config.DIP_TEST_LABEL_DIR_TEXT_ZIXUAN3,
-             # config.DIP_TEST_LABEL_DIR_TEXT_ZIXUAN4,
-             # config.DIP_TRAIN_LABEL_DIR_TEXT_ZIXUAN,
-             # config.DIP_TRAIN_LABEL_DIR_TEXT_ZIXUAN2,
-             # config.DIP_TEST_LABEL_DIR_TEXT_ZIXUAN3,
-             # config.DIP_TEST_LABEL_DIR_TEXT_ZIXUAN4,
-             # config.DIP_TRAIN_LABEL_DIR_TEXT_ZIXUAN,
-             # config.DIP_TRAIN_LABEL_DIR_TEXT_ZIXUAN2,
-             # config.DIP_TEST_LABEL_DIR_TEXT_ZIXUAN3,
-             # config.DIP_TEST_LABEL_DIR_TEXT_ZIXUAN4,
-             # config.DIP_TRAIN_LABEL_DIR_TEXT_ZIXUAN,
-             # config.DIP_TRAIN_LABEL_DIR_TEXT_ZIXUAN2,
-             # config.DIP_TEST_LABEL_DIR_TEXT_ZIXUAN3,
-             # config.DIP_TEST_LABEL_DIR_TEXT_ZIXUAN4,
-             # config.DIP_TRAIN_LABEL_DIR_TEXT_ZIXUAN,
-             # config.DIP_TRAIN_LABEL_DIR_TEXT_ZIXUAN2,
-             # config.DIP_TEST_LABEL_DIR_TEXT_ZIXUAN3,
-             # config.DIP_TEST_LABEL_DIR_TEXT_ZIXUAN4,
+train_dir = [config.MIWI_2018_TRAIN_LABEL_DIR,
+             config.DIP_TRAIN_LABEL_DIR_TEXT_ZIXUAN,
+             config.DIP_TRAIN_LABEL_DIR_TEXT_ZIXUAN2,
+             config.DIP_TEST_LABEL_DIR_TEXT_ZIXUAN3,
+             config.DIP_TEST_LABEL_DIR_TEXT_ZIXUAN4,
+             config.DIP_TRAIN_LABEL_DIR_TEXT_ZIXUAN,
+             config.DIP_TRAIN_LABEL_DIR_TEXT_ZIXUAN2,
+             config.DIP_TEST_LABEL_DIR_TEXT_ZIXUAN3,
+             config.DIP_TEST_LABEL_DIR_TEXT_ZIXUAN4,
+             config.DIP_TRAIN_LABEL_DIR_TEXT_ZIXUAN,
+             config.DIP_TRAIN_LABEL_DIR_TEXT_ZIXUAN2,
+             config.DIP_TEST_LABEL_DIR_TEXT_ZIXUAN3,
+             config.DIP_TEST_LABEL_DIR_TEXT_ZIXUAN4,
+             config.DIP_TRAIN_LABEL_DIR_TEXT_ZIXUAN,
+             config.DIP_TRAIN_LABEL_DIR_TEXT_ZIXUAN2,
+             config.DIP_TEST_LABEL_DIR_TEXT_ZIXUAN3,
+             config.DIP_TEST_LABEL_DIR_TEXT_ZIXUAN4,
+             config.DIP_TRAIN_LABEL_DIR_TEXT_ZIXUAN,
+             config.DIP_TRAIN_LABEL_DIR_TEXT_ZIXUAN2,
+             config.DIP_TEST_LABEL_DIR_TEXT_ZIXUAN3,
+             config.DIP_TEST_LABEL_DIR_TEXT_ZIXUAN4,
 
                 config.DIP_TRAIN_LABEL_DIR_TEXT_ZIXUAN5,
                 config.DIP_TRAIN_LABEL_DIR_TEXT_ZIXUAN6,
              ]
 
-test_dir = [#config.MIWI_2018_TEST_LABEL_DIR,
-            # config.DIP_TRAIN_LABEL_DIR_TEXT_ZIXUAN,
-            # config.DIP_TRAIN_LABEL_DIR_TEXT_ZIXUAN2,
-            # config.DIP_TEST_LABEL_DIR_TEXT_ZIXUAN3,
-            # config.DIP_TEST_LABEL_DIR_TEXT_ZIXUAN4,
+test_dir = [config.MIWI_2018_TEST_LABEL_DIR,
+            config.DIP_TRAIN_LABEL_DIR_TEXT_ZIXUAN,
+            config.DIP_TRAIN_LABEL_DIR_TEXT_ZIXUAN2,
+            config.DIP_TEST_LABEL_DIR_TEXT_ZIXUAN3,
+            config.DIP_TEST_LABEL_DIR_TEXT_ZIXUAN4,
             config.DIP_TEST_LABEL_DIR_TEXT_ZIXUAN5,
             config.DIP_TEST_LABEL_DIR_TEXT_ZIXUAN6,]
 batch_size = 8
