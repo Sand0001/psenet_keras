@@ -116,7 +116,7 @@ from sklearn.metrics import roc_auc_score
 
 
 class Val_callback(keras.callbacks.Callback):
-    def on_epoch_end(self, epoch, logs=None):
+    def on_epoch_begin(self, epoch, logs=None):
         print(len(self.validation_data))
         print(self.validation_data)
 
