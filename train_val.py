@@ -217,7 +217,7 @@ class Val_callback(keras.callbacks.Callback):
         det_path = '/data/mahuichao/PSENET/data/det_txt'
         gt_path = '/data/mahuichao/PSENET/data/gt_txt'
 
-        if epoch ==10:
+        if epoch > 60 and epoch%5 == 0:
             val_data_list = os.listdir(val_data_path)
             for pic in val_data_list:
                 img = cv2.imread(os.path.join(val_data_path,pic))
@@ -240,7 +240,7 @@ res = multi_model.fit_generator(gen_train,
                           validation_data=gen_test,
                           validation_steps =gen_test.num_samples()//batch_size ,
                           verbose=1,
-                          initial_epoch=150,
+                          initial_epoch=0,
                           workers=4,
                           use_multiprocessing=False,
                           max_queue_size=64,
