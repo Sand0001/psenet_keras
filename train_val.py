@@ -14,6 +14,7 @@ KTF.set_session(session)
 #%%
 import keras
 from models.psenet import psenet
+from cal_recall import cal_recall_precison_f1
 #%%
 shape = (None,None,3)
 
@@ -28,6 +29,9 @@ from keras.optimizers import Adam
 from models.loss import build_loss
 from models.metrics import build_iou,mean_iou
 from keras.utils import multi_gpu_model
+
+from psenet.utils_up4 import scale_expand_kernels ,text_porposcal , fit_boundingRect_cpp ,fit_minarearectange_cpp
+from psenet.utils_up4 import calc_vote_angle , fit_boundingRect_warp_cpp
 
 # model.load_weights('./tf/single0929.hdf5')
 
@@ -67,7 +71,7 @@ train_dir = [#config.MIWI_2018_TRAIN_LABEL_DIR,
 #              config.DIP_TRAIN_LABEL_DIR_TEXT_ZIXUAN2,
 #              config.DIP_TEST_LABEL_DIR_TEXT_ZIXUAN3,
 #              config.DIP_TEST_LABEL_DIR_TEXT_ZIXUAN4,
-             config.DIP_TRAIN_LABEL_DIR_TEXT_ZIXUAN,
+#              config.DIP_TRAIN_LABEL_DIR_TEXT_ZIXUAN,
              config.DIP_TRAIN_LABEL_DIR_TEXT_ZIXUAN2,
              config.DIP_TEST_LABEL_DIR_TEXT_ZIXUAN3,
              config.DIP_TEST_LABEL_DIR_TEXT_ZIXUAN4,
@@ -115,18 +119,14 @@ lr = LearningRateScheduler(schedule)
 from sklearn.metrics import roc_auc_score
 
 
-class Val_callback(keras.callbacks.Callback):
+class V1al_callback(keras.callbacks.Callback):
     def on_epoch_begin(self, epoch, logs=None):
-        print(len(self.validation_data))
-        print(self.validation_data)
+        print('len(self.validation_data)',len(self.validation_data))
+        print('self.validation_data',self.validation_data)
 
 
-class roc_callback(keras.callbacks.Callback):
-    def __init__(self, training_data, validation_data):
-        self.x = training_data[0]
-        self.y = training_data[1]
-        self.x_val = validation_data[0]
-        self.y_val = validation_data[1]
+class Val_callback(keras.callbacks.Callback):
+
 
     def pre_pic(self,images):
         MIN_LEN = 32
@@ -161,16 +161,67 @@ class roc_callback(keras.callbacks.Callback):
         images = np.reshape(images, (1, h, w, 3))
         return images,scalex,scaley
 
+    def post_process(self,pic,res,scalex,scaley,det_path):
+        res1 = res[0][0]
+        res1[res1 > 0.9] = 1
+        res1[res1 <= 0.9] = 0
+        newres1 = []
+        for i in range(0, 5):
+            n = np.logical_and(res1[:, :, 5], res1[:, :, i]) * 255
+            n = n.astype('int32')
+            newres1.append(n)
+
+        # 计算角度
+        degree = calc_vote_angle(newres1[-1])
+        num_label, labelimage = scale_expand_kernels(newres1, filter=False)
+        labelimage_tmp = labelimage.copy()
+        labelimage_tmp[labelimage_tmp > 0] = 255
+        h, w = labelimage.shape[0:2]
+        M = cv2.getRotationMatrix2D((w / 2, h / 2), degree, 1.0)
+        neg_M = cv2.getRotationMatrix2D((w / 2, h / 2), -degree, 1.0)
+
+        rects = fit_boundingRect_warp_cpp(num_label - 1, labelimage, M)
+
+        rects = np.array(rects)
+        if rects.shape[0] > 0:
+            # print(rects.shape)
+            rects = cv2.transform(np.array(rects), neg_M)
+            # rects_a = rects.tolist()
+        if rects.shape[0] > 0:
+            rects = rects.reshape(-1, 8)
+
+        results = []
+        for rt in rects:
+            # rt = [rt[0][0], rt[0][1], rt[1][0], rt[1][1], rt[2][0], rt[2][1], rt[3][0], rt[3][1]]
+            rt[0] = rt[0] * 2 * scalex
+            rt[1] = rt[1] * 2 * scaley
+            rt[2] = rt[2] * 2 * scalex
+            rt[3] = rt[3] * 2 * scaley
+            rt[4] = rt[4] * 2 * scalex
+            rt[5] = rt[5] * 2 * scaley
+            rt[6] = rt[6] * 2 * scalex
+            rt[7] = rt[7] * 2 * scaley
+            # rt[4], rt[6] = rt[6], rt[4]
+            # rt[5], rt[7] = rt[7], rt[5]
+            rt = np.append(rt, degree)
+            results.append(rt)
+        np.save(os.path.join(det_path,pic), np.array(results))
+
 
     def on_epoch_end(self, epoch, logs={}):
+        val_data_path = '/data/mahuichao/PSENET/data/det_pic'
+        det_path = '/data/mahuichao/PSENET/data/det_txt'
+        gt_path = '/data/mahuichao/PSENET/data/gt_txt'
 
-        y_pred = self.model.predict(self.x)
-        roc = roc_auc_score(self.y, y_pred)
+        val_data_list = os.listdir(val_data_path)
+        for pic in val_data_list:
+            img = cv2.imread(os.path.join(val_data_path,pic))
+            img,scalex,scaley = self.pre_pic(img)
 
-        y_pred_val = self.model.predict(self.x_val)
-        roc_val = roc_auc_score(self.y_val, y_pred_val)
-
-        print('\rroc-auc: %s - roc-auc_val: %s' % (str(round(roc, 4)), str(round(roc_val, 4))), end=100 * ' ' + '\n')
+            res = self.model.predict(img)
+            self.post_process(pic,res,scalex,scaley,det_path)
+        result_dict = cal_recall_precison_f1(gt_path, det_path)
+        print('val_data',result_dict)
         return
 
 val_callback = Val_callback()
