@@ -162,10 +162,12 @@ class Val_callback(keras.callbacks.Callback):
         return images,scalex,scaley
 
     def post_process(self,pic,res,scalex,scaley,det_path):
-        res1 = res[0][0]
+        res1 = res[0]
         res1[res1 > 0.9] = 1
         res1[res1 <= 0.9] = 0
         newres1 = []
+        print('res1.shape',res1.shape)
+
         for i in range(0, 5):
             n = np.logical_and(res1[:, :, 5], res1[:, :, i]) * 255
             n = n.astype('int32')
@@ -205,7 +207,9 @@ class Val_callback(keras.callbacks.Callback):
             # rt[5], rt[7] = rt[7], rt[5]
             rt = np.append(rt, degree)
             results.append(rt)
-        np.save(os.path.join(det_path,pic), np.array(results))
+        # np.save(os.path.join(det_path,pic), np.array(results))
+        a = np.array(results).reshape(-1, 8)
+        np.savetxt(os.path.join(det_path,pic) + '.txt', a, delimiter=',', fmt='%d')
 
 
     def on_epoch_end(self, epoch, logs={}):
