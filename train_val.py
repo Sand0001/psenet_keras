@@ -205,7 +205,7 @@ class Val_callback(keras.callbacks.Callback):
             rt[7] = rt[7] * 2 * scaley
             # rt[4], rt[6] = rt[6], rt[4]
             # rt[5], rt[7] = rt[7], rt[5]
-            rt = np.append(rt, degree)
+            # rt = np.append(rt, degree)
             results.append(rt)
         # np.save(os.path.join(det_path,pic), np.array(results))
         a = np.array(results).reshape(-1, 8)
