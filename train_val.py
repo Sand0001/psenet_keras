@@ -217,15 +217,16 @@ class Val_callback(keras.callbacks.Callback):
         det_path = '/data/mahuichao/PSENET/data/det_txt'
         gt_path = '/data/mahuichao/PSENET/data/gt_txt'
 
-        val_data_list = os.listdir(val_data_path)
-        for pic in val_data_list:
-            img = cv2.imread(os.path.join(val_data_path,pic))
-            img,scalex,scaley = self.pre_pic(img)
+        if epoch ==10:
+            val_data_list = os.listdir(val_data_path)
+            for pic in val_data_list:
+                img = cv2.imread(os.path.join(val_data_path,pic))
+                img,scalex,scaley = self.pre_pic(img)
 
-            res = self.model.predict(img)
-            self.post_process(pic,res,scalex,scaley,det_path)
-        result_dict = cal_recall_precison_f1(gt_path, det_path)
-        print('val_data',result_dict)
+                res = self.model.predict(img)
+                self.post_process(pic,res,scalex,scaley,det_path)
+            result_dict = cal_recall_precison_f1(gt_path, det_path)
+            print('val_data',result_dict)
         return
 
 val_callback = Val_callback()
