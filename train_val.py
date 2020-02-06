@@ -208,7 +208,7 @@ class Val_callback(keras.callbacks.Callback):
             # rt = np.append(rt, degree)
             results.append(rt)
         # np.save(os.path.join(det_path,pic), np.array(results))
-        a = np.array(results).reshape(-1, 8)
+        a = np.array(results)
         np.savetxt(os.path.join(det_path,pic) + '.txt', a, delimiter=',', fmt='%d')
 
 
