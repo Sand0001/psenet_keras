@@ -30,7 +30,7 @@ from models.loss import build_loss
 from models.metrics import build_iou,mean_iou
 from keras.utils import multi_gpu_model
 
-from psenet.utils_up4 import scale_expand_kernels ,text_porposcal , fit_boundingRect_cpp ,fit_minarearectange_cpp
+from psenet.utils_up4 import scale_expand_kernels ,fit_minarearectange
 from psenet.utils_up4 import calc_vote_angle , fit_boundingRect_warp_cpp
 
 # model.load_weights('./tf/single0929.hdf5')
@@ -54,8 +54,8 @@ from tool.generator import Generator
 
 #%%
 import config
-train_dir = [#config.MIWI_2018_TRAIN_LABEL_DIR,
-#              config.DIP_TRAIN_LABEL_DIR_TEXT_ZIXUAN,
+train_dir = [config.MIWI_2018_TRAIN_LABEL_DIR,
+             config.DIP_TRAIN_LABEL_DIR_TEXT_ZIXUAN,
 #              config.DIP_TRAIN_LABEL_DIR_TEXT_ZIXUAN2,
 #              config.DIP_TEST_LABEL_DIR_TEXT_ZIXUAN3,
 #              config.DIP_TEST_LABEL_DIR_TEXT_ZIXUAN4,
@@ -77,7 +77,7 @@ train_dir = [#config.MIWI_2018_TRAIN_LABEL_DIR,
              config.DIP_TEST_LABEL_DIR_TEXT_ZIXUAN4,
              ]
 
-test_dir = [#config.MIWI_2018_TEST_LABEL_DIR,
+test_dir = [config.MIWI_2018_TEST_LABEL_DIR,
             config.DIP_TRAIN_LABEL_DIR_TEXT_ZIXUAN,
             config.DIP_TRAIN_LABEL_DIR_TEXT_ZIXUAN2,
             config.DIP_TEST_LABEL_DIR_TEXT_ZIXUAN3,
@@ -181,9 +181,7 @@ class Val_callback(keras.callbacks.Callback):
         h, w = labelimage.shape[0:2]
         M = cv2.getRotationMatrix2D((w / 2, h / 2), degree, 1.0)
         neg_M = cv2.getRotationMatrix2D((w / 2, h / 2), -degree, 1.0)
-
-        rects = fit_boundingRect_warp_cpp(num_label - 1, labelimage, M)
-
+        rects = fit_minarearectange(num_label - 1, labelimage)
         rects = np.array(rects)
         if rects.shape[0] > 0:
             # print(rects.shape)
@@ -217,7 +215,7 @@ class Val_callback(keras.callbacks.Callback):
         det_path = '/data/mahuichao/PSENET/data/det_txt'
         gt_path = '/data/mahuichao/PSENET/data/gt_txt'
 
-        if epoch > 60 and epoch%5 == 0:
+        if epoch > 60 and epoch % 5 == 0:
             val_data_list = os.listdir(val_data_path)
             for pic in val_data_list:
                 img = cv2.imread(os.path.join(val_data_path,pic))
