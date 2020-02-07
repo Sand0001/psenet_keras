@@ -31,7 +31,7 @@ from models.metrics import build_iou,mean_iou
 from keras.utils import multi_gpu_model
 
 from psenet.utils_up4 import scale_expand_kernels ,fit_minarearectange
-from psenet.utils_up4 import calc_vote_angle , fit_boundingRect_warp_cpp
+from psenet.utils_up4 import calc_vote_angle
 
 # model.load_weights('./tf/single0929.hdf5')
 
@@ -116,15 +116,6 @@ def schedule(epoch):
         return 1e-6
 lr = LearningRateScheduler(schedule)
 
-from sklearn.metrics import roc_auc_score
-
-
-class V1al_callback(keras.callbacks.Callback):
-    def on_epoch_begin(self, epoch, logs=None):
-        print('len(self.validation_data)',len(self.validation_data))
-        print('self.validation_data',self.validation_data)
-
-
 class Val_callback(keras.callbacks.Callback):
 
 
@@ -166,7 +157,6 @@ class Val_callback(keras.callbacks.Callback):
         res1[res1 > 0.9] = 1
         res1[res1 <= 0.9] = 0
         newres1 = []
-        print('res1.shape',res1.shape)
 
         for i in range(0, 5):
             n = np.logical_and(res1[:, :, 5], res1[:, :, i]) * 255
