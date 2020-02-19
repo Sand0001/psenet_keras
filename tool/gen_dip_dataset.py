@@ -54,7 +54,7 @@ def gen_dataset(data):
     dst_dir = data[1]
     try:
         basename = '.'.join(os.path.basename(imgname).split('.')[:-1])
-        img = cv2.imread(imgname[:-5]+'.jpg')
+        img = cv2.imread(imgname[:-5]+'.png')
 
         MIN_LEN = 32
         MAX_LEN = 4680
@@ -135,18 +135,18 @@ def create_dataset():
     gen_dataset(test_data,config.DIP_TEST_LABEL_DIR)
 
 if __name__=='__main__':
-    data = read_dataset(config.DIP_JSON_DIR_TEXT_ZIXUAN5,config.DIP_IMG_DIR_TEXT_ZIXUAN5)
+    data = read_dataset(config.DIP_JSON_DIR_TEXT_CHECKBOX,config.DIP_IMG_DIR_TEXT_CHECKBOX)
     # data = read_dataset('/fengjing/test_img/eng_tmp/text_zixuan5/label','/fengjing/test_img/eng_tmp/text_zixuan5/image')
     #split trian and test data
     train_num = int(len(data) * 0.9)
     train_data = {key:data[key] for i,key in enumerate(data) if i<train_num }
     test_data  = {key:data[key] for i,key in enumerate(data) if i>=train_num }
 
-    del_allfile(config.DIP_TRAIN_LABEL_DIR_TEXT_ZIXUAN3)
-    del_allfile(config.DIP_TEST_LABEL_DIR_TEXT_ZIXUAN3)
+    del_allfile(config.DIP_TRAIN_LABEL_DIR_TEXT_CHECKBOX)
+    del_allfile(config.DIP_TEST_LABEL_DIR_TEXT_CHECKBOX)
 
-    with mp.Pool(processes=max(os.cpu_count(), 2)) as pool:
-        pool.map(gen_dataset,zip(train_data.items(),repeat(config.DIP_TRAIN_LABEL_DIR_TEXT_ZIXUAN5)))
-        pool.map(gen_dataset,zip(test_data.items(),repeat(config.DIP_TEST_LABEL_DIR_TEXT_ZIXUAN5)))
+    with mp.Pool(processes=max(8, 2)) as pool:
+        pool.map(gen_dataset,zip(train_data.items(),repeat(config.DIP_TRAIN_LABEL_DIR_TEXT_CHECKBOX)))
+        pool.map(gen_dataset,zip(test_data.items(),repeat(config.DIP_TEST_LABEL_DIR_TEXT_CHECKBOX)))
 
 
