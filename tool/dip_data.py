@@ -26,27 +26,27 @@ def read_dataset(json_file_dir,image_dir):
         imgfilename = os.path.join(image_dir,os.path.basename(imgfilename))
         bndboxes = js['bndbox'] 
         boxes = [] 
-        # for bndbox in bndboxes:
-        #     x1 = int(bndbox['x1'])
-        #     y1 = int(bndbox['y1'])
-        #     x2 = int(bndbox['x2'])
-        #     y2 = int(bndbox['y2'])
-        #     x3 = int(bndbox['x3'])
-        #     y3 = int(bndbox['y3'])
-        #     x4 = int(bndbox['x4'])
-        #     y4 = int(bndbox['y4'])
-        #     boxes.append([[x1,y1],[x2,y2],[x3,y3],[x4,y4]])
         for bndbox in bndboxes:
-            # print(bndbox)
-            x1 = int(bndbox['y1'])
-            y1 = int(bndbox['x1'])
-            x4 = int(bndbox['y2'])
-            y4 = int(bndbox['x2'])
-            x2 = int(bndbox['y3'])
-            y2 = int(bndbox['x3'])
-            x3 = int(bndbox['y4'])
-            y3= int(bndbox['x4'])
+            x1 = int(bndbox['x1'])
+            y1 = int(bndbox['y1'])
+            x2 = int(bndbox['x2'])
+            y2 = int(bndbox['y2'])
+            x3 = int(bndbox['x3'])
+            y3 = int(bndbox['y3'])
+            x4 = int(bndbox['x4'])
+            y4 = int(bndbox['y4'])
             boxes.append([[x1,y1],[x2,y2],[x3,y3],[x4,y4]])
+        # for bndbox in bndboxes:
+        #     # print(bndbox)
+        #     x1 = int(bndbox['y1'])
+        #     y1 = int(bndbox['x1'])
+        #     x4 = int(bndbox['y2'])
+        #     y4 = int(bndbox['x2'])
+        #     x2 = int(bndbox['y3'])
+        #     y2 = int(bndbox['x3'])
+        #     x3 = int(bndbox['y4'])
+        #     y3= int(bndbox['x4'])
+        #     boxes.append([[x1,y1],[x2,y2],[x3,y3],[x4,y4]])
         dataset[imgfilename] = boxes
     return dataset
 
