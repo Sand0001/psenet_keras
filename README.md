@@ -17,4 +17,7 @@ For more detials , please see the the original paper : [Shape Robust Text Detect
 | PSENet-2s-resnet50 | 72.2 | 68.7 | 0.704 |
 
 
+conda acitvate env 激活python3环境，如果不激活python3环境会出现，找不到python.h文件。
+编译 cpp文件
+c++ -O3 -Wall -shared -std=c++11 -undefined dynamic_lookup `python3 -m pybind11 --includes` pse.cpp -o pse`python3-config --extension-suffix`
 
